@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Airlock: High-assurance, low-latency AI command security classifier for autonomous coding agents (Antigravity/AGY, Claude Code, OpenAI Operator)"
 readme = "README.md"
 authors = [
-    { name = "Danny" }
+    { name = "Deepesh Parpani", email = "deepesh.parpani@gmail.com" }
 ]
 license = { text = "MIT" }
 requires-python = ">=3.10"
