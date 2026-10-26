@@ -271,7 +271,7 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
     if cmd == "bash install.sh" || cmd == "./install.sh" || cmd == "sh install.sh" {
         return true;
     }
-    if cmd == r#"python3 -c "import sys; print(sys.version)""# || cmd == "python3 --version" || cmd == "python --version" {
+    if is_safe_python_command(cmd) {
         return true;
     }
     if cmd == r#"sqlite3 :memory: "SELECT 1;""# {
@@ -301,6 +301,78 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
     }
 
     false
+}
+
+pub fn is_safe_python_command(cmd: &str) -> bool {
+    if cmd == "python3 --version" || cmd == "python --version" || cmd == "python3 -V" || cmd == "python -V" {
+        return true;
+    }
+
+    if cmd.starts_with("python3 -m pytest")
+        || cmd.starts_with("python -m pytest")
+        || cmd.starts_with("python3 -m unittest")
+        || cmd.starts_with("python -m unittest")
+        || cmd.starts_with("pytest ")
+        || cmd == "pytest"
+    {
+        if !cmd.contains('>') && !cmd.contains('<') && !cmd.contains('|') && !cmd.contains(';') && !cmd.contains('`') && !cmd.contains('$') {
+            return true;
+        }
+    }
+
+    let prefix = if cmd.starts_with("python3 -c ") {
+        Some("python3 -c ")
+    } else if cmd.starts_with("python -c ") {
+        Some("python -c ")
+    } else if cmd.starts_with("python3 -c\"") || cmd.starts_with("python3 -c'") {
+        Some("python3 -c")
+    } else if cmd.starts_with("python -c\"") || cmd.starts_with("python -c'") {
+        Some("python -c")
+    } else {
+        None
+    };
+
+    let p = match prefix {
+        Some(p) => p,
+        None => return false,
+    };
+
+    let mut code_part = cmd[p.len()..].trim();
+    if (code_part.starts_with('"') && code_part.ends_with('"'))
+        || (code_part.starts_with('\'') && code_part.ends_with('\''))
+    {
+        if code_part.len() >= 2 {
+            code_part = code_part[1..code_part.len() - 1].trim();
+        }
+    }
+
+    let lower_code = code_part.to_lowercase();
+    let dangerous_terms = [
+        "os.", "subprocess", "popen", "pty", "shutil", "socket", "urllib", "requests", "http.client",
+        "eval(", "exec(", "open(", "__import__", "unlink", "remove", "rmdir", "chmod", "chown",
+        "ctypes", "builtins", "getattr", "setattr", "delattr", "system(", "spawn", "fork", "kill",
+        "breakpoint", "compile(",
+    ];
+    for dt in dangerous_terms {
+        if lower_code.contains(dt) {
+            return false;
+        }
+    }
+
+    let sensitive_terms = [
+        "id_rsa", ".env", ".gemini", "token", "password", "secret", "keychain", "aws_",
+    ];
+    for st in sensitive_terms {
+        if lower_code.contains(st) {
+            return false;
+        }
+    }
+
+    if code_part.contains('`') || code_part.contains('$') {
+        return false;
+    }
+
+    true
 }
 
 #[cfg(test)]
@@ -338,5 +410,17 @@ mod tests {
         assert!(is_safe_fast_path("cd /Users/danny/bkc-pilot && git status"));
         assert!(!is_safe_fast_path("cd /Users/danny/bkc-pilot && rm -rf /"));
         assert!(!is_safe_fast_path("cd `rm -rf /` && git status"));
+    }
+
+    #[test]
+    fn test_safe_python_diagnostics() {
+        assert!(is_safe_fast_path("python3 -c \"import model_comparison_v1.run_packet; print('RUN_PACKET_IMPORT_OK')\""));
+        assert!(is_safe_fast_path("cd /Users/danny/bkc-pilot && python3 -c \"import model_comparison_v1.run_packet; print('RUN_PACKET_IMPORT_OK')\""));
+        assert!(is_safe_fast_path("python3 -m pytest tests/"));
+        assert!(is_safe_fast_path("python3 --version"));
+        // Reject unsafe python
+        assert!(!is_safe_fast_path("python3 -c \"import os; os.system('rm -rf /')\""));
+        assert!(!is_safe_fast_path("python3 -c \"open('.env').read()\""));
+        assert!(!is_safe_fast_path("python3 -c \"import subprocess; subprocess.run(['id'])\""));
     }
 }

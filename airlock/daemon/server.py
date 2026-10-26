@@ -53,13 +53,22 @@ def start_daemon_server():
             except OSError:
                 pass
 
-    lock_fd = acquire_singleton_lock()
-    if lock_fd is None:
-        # Another daemon is currently booting or running
-        return
-
+    # If port file was invalid or dead, terminate stale daemons before acquiring the lock
     kill_other_daemons()
     kill_stale_workers()
+
+    lock_fd = acquire_singleton_lock()
+    if lock_fd is None:
+        # Give a legitimately booting daemon a brief moment
+        time.sleep(0.5)
+        if os.path.exists(PORT_FILE):
+            return
+        # If still no port file, force cleanup and try acquiring lock once more
+        kill_other_daemons()
+        kill_stale_workers()
+        lock_fd = acquire_singleton_lock()
+        if lock_fd is None:
+            return
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

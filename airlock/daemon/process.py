@@ -58,10 +58,12 @@ def safely_terminate_proc(p):
 def setup_isolated_gemini_dir():
     cli_dir = os.path.join(AIRLOCK_GEMINI_DIR, "antigravity-cli")
     os.makedirs(cli_dir, exist_ok=True)
-    real_gemini = os.path.expanduser("~/.gemini/antigravity-cli")
-    for item in ("antigravity-oauth-token", "settings.json"):
-        src = os.path.join(real_gemini, item)
-        dst = os.path.join(cli_dir, item)
+    os.makedirs(AIRLOCK_GEMINI_DIR, exist_ok=True)
+
+    root_gemini = os.path.expanduser("~/.gemini")
+    real_cli = os.path.join(root_gemini, "antigravity-cli")
+
+    def _link_item(src: str, dst: str):
         if os.path.exists(src):
             if os.path.islink(dst) or os.path.exists(dst):
                 try:
@@ -75,6 +77,16 @@ def setup_isolated_gemini_dir():
                     shutil.copy2(src, dst)
                 except OSError:
                     pass
+
+    # Link auth credentials and configuration files
+    for fname in ("oauth_creds.json", "google_accounts.json", "installation_id", "settings.json"):
+        src = os.path.join(root_gemini, fname)
+        _link_item(src, os.path.join(AIRLOCK_GEMINI_DIR, fname))
+        _link_item(src, os.path.join(cli_dir, fname))
+
+    for fname in ("settings.json", "installation_id", "antigravity-oauth-token"):
+        src = os.path.join(real_cli, fname)
+        _link_item(src, os.path.join(cli_dir, fname))
 
 def kill_stale_workers():
     if os.name != "nt":

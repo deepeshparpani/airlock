@@ -119,6 +119,60 @@ def is_safe_cluster_inspection(cmd: str) -> bool:
 
     return False
 
+def is_safe_python_command(cmd: str) -> bool:
+    """Verifies benign Python inspection, import checking, and testing commands."""
+    if cmd in ("python3 --version", "python --version", "python3 -V", "python -V"):
+        return True
+
+    # Safe test runners
+    if cmd.startswith("python3 -m pytest") or cmd.startswith("python -m pytest") or \
+       cmd.startswith("python3 -m unittest") or cmd.startswith("python -m unittest") or \
+       cmd.startswith("pytest ") or cmd == "pytest":
+        if not any(c in cmd for c in ('>', '<', '|', ';', '`', '$')):
+            return True
+
+    # Safe python3 -c / python -c inline scripts
+    prefix = None
+    if cmd.startswith("python3 -c "):
+        prefix = "python3 -c "
+    elif cmd.startswith("python -c "):
+        prefix = "python -c "
+    elif cmd.startswith("python3 -c\"") or cmd.startswith("python3 -c'"):
+        prefix = "python3 -c"
+    elif cmd.startswith("python -c\"") or cmd.startswith("python -c'"):
+        prefix = "python -c"
+
+    if prefix is None:
+        return False
+
+    code_part = cmd[len(prefix):].strip()
+    if (code_part.startswith('"') and code_part.endswith('"')) or \
+       (code_part.startswith("'") and code_part.endswith("'")):
+        code_part = code_part[1:-1].strip()
+
+    lower_code = code_part.lower()
+
+    # Reject dangerous operations, system execution, socket creation, filesystem mutation, or eval
+    dangerous_terms = (
+        "os.", "subprocess", "popen", "pty", "shutil", "socket", "urllib", "requests", "http.client",
+        "eval(", "exec(", "open(", "__import__", "unlink", "remove", "rmdir", "chmod", "chown",
+        "ctypes", "builtins", "getattr", "setattr", "delattr", "system(", "spawn", "fork", "kill",
+        "breakpoint", "compile("
+    )
+    if any(dt in lower_code for dt in dangerous_terms):
+        return False
+
+    # Reject direct credential/secret path inspection
+    sensitive_terms = ("id_rsa", ".env", ".gemini", "token", "password", "secret", "keychain", "aws_")
+    if any(st in lower_code for st in sensitive_terms):
+        return False
+
+    # Disallow backticks or subshell expansion inside the script
+    if any(c in code_part for c in ('`', '$')):
+        return False
+
+    return True
+
 def is_safe_fast_path(command_line: str) -> bool:
     """Instant local allow for verified benign, read-only developer commands (<1ms)."""
     cmd = command_line.strip()
@@ -197,7 +251,7 @@ def is_safe_fast_path(command_line: str) -> bool:
         return True
     if cmd in ("bash install.sh", "./install.sh", "sh install.sh"):
         return True
-    if cmd == 'python3 -c "import sys; print(sys.version)"' or cmd == "python3 --version" or cmd == "python --version":
+    if is_safe_python_command(cmd):
         return True
     if cmd == 'sqlite3 :memory: "SELECT 1;"':
         return True

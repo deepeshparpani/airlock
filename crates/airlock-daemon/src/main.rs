@@ -43,28 +43,39 @@ impl WorkerManager {
     fn setup_isolated_gemini_dir(&self) {
         let cli_dir = self.gemini_dir.join("antigravity-cli");
         let _ = fs::create_dir_all(&cli_dir);
+        let _ = fs::create_dir_all(&self.gemini_dir);
         let home = env::var("HOME").unwrap_or_default();
-        let real_gemini = PathBuf::from(home).join(".gemini").join("antigravity-cli");
+        let root_gemini = PathBuf::from(&home).join(".gemini");
+        let real_cli = root_gemini.join("antigravity-cli");
 
-        for item in ["antigravity-oauth-token", "settings.json"] {
-            let src = real_gemini.join(item);
-            let dst = cli_dir.join(item);
+        let link_file = |src: &PathBuf, dst: &PathBuf| {
             if src.exists() {
                 if dst.exists() || dst.is_symlink() {
-                    let _ = fs::remove_file(&dst);
+                    let _ = fs::remove_file(dst);
                 }
                 #[cfg(unix)]
                 {
                     use std::os::unix::fs::symlink;
-                    if symlink(&src, &dst).is_err() {
-                        let _ = fs::copy(&src, &dst);
+                    if symlink(src, dst).is_err() {
+                        let _ = fs::copy(src, dst);
                     }
                 }
                 #[cfg(not(unix))]
                 {
-                    let _ = fs::copy(&src, &dst);
+                    let _ = fs::copy(src, dst);
                 }
             }
+        };
+
+        for item in ["oauth_creds.json", "google_accounts.json", "installation_id", "settings.json"] {
+            let src = root_gemini.join(item);
+            link_file(&src, &self.gemini_dir.join(item));
+            link_file(&src, &cli_dir.join(item));
+        }
+
+        for item in ["settings.json", "installation_id", "antigravity-oauth-token"] {
+            let src = real_cli.join(item);
+            link_file(&src, &cli_dir.join(item));
         }
     }
 
