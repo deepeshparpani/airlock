@@ -1,8 +1,10 @@
 pub mod config;
+pub mod daemon;
 pub mod redactor;
 pub mod rules;
 
 pub use config::{is_trusted_remote_host, SAFE_BUILD_ARTIFACT_NAMES};
+pub use daemon::{CircuitBreaker, PortManifest, SingletonLock};
 pub use redactor::redact_secrets;
 pub use rules::{
     check_recursive_rm_violations, check_tier0_hard_deny, is_safe_build_artifact_path,

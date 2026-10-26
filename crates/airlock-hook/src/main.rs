@@ -1,11 +1,12 @@
-use airlock_core::{evaluate_tier0, redact_secrets, Decision};
+use airlock_core::{evaluate_tier0, redact_secrets, Decision, PortManifest};
 use serde::Serialize;
 use serde_json::Value;
 use std::env;
-use std::io::{self, Read, Write};
+use std::io::{self, BufRead, BufReader, Read, Write};
+use std::net::{SocketAddr, TcpStream};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 #[derive(Serialize)]
 struct HookOutput {
@@ -65,33 +66,70 @@ fn print_verdict(decision: Decision, reason: &str, elapsed_micros: u128) {
 
 fn extract_command_from_payload(raw: &str) -> Option<String> {
     if let Ok(val) = serde_json::from_str::<Value>(raw) {
-        // 1. Antigravity format: toolCall.args.CommandLine / command
         if let Some(cmd) = val.pointer("/toolCall/args/CommandLine").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
         if let Some(cmd) = val.pointer("/toolCall/args/command").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
-        // 2. Snake case: tool_call.args.CommandLine
         if let Some(cmd) = val.pointer("/tool_call/args/CommandLine").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
         if let Some(cmd) = val.pointer("/tool_call/args/command").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
-        // 3. tool_input.CommandLine / command
         if let Some(cmd) = val.pointer("/tool_input/CommandLine").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
         if let Some(cmd) = val.pointer("/tool_input/command").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
-        // 4. Top-level command
         if let Some(cmd) = val.get("command").and_then(|v| v.as_str()) {
             return Some(cmd.to_string());
         }
     }
     None
+}
+
+/// Attempts to query the warm background daemon over loopback TCP with authentication token
+fn query_live_daemon(cmd: &str) -> Option<(String, String)> {
+    let manifest = PortManifest::read_current()?;
+    let addr = SocketAddr::from(([127, 0, 0, 1], manifest.port));
+    let mut stream = TcpStream::connect_timeout(&addr, Duration::from_millis(500)).ok()?;
+    stream.set_read_timeout(Some(Duration::from_secs(30))).ok()?;
+    stream.set_write_timeout(Some(Duration::from_secs(5))).ok()?;
+
+    let prompt = format!(
+        "You are a low-latency security classifier for shell commands requested by an AI coding assistant.\n\
+         Evaluate the following command for security:\n\
+         ```\n{}\n```\n\n\
+         SECURITY POLICY:\n\
+         1. ALLOW standard, benign software development tasks (compiling, tests, linting, git commits, standard build tools).\n\
+         2. ALLOW remote computing, cluster node checks, Slurm job management, and SSH execution to trusted institutional/cluster hosts (cook.cs.umass.edu, *.cs.umass.edu, *.umass.edu).\n\
+         3. DENY dangerous, destructive, or unauthorized commands (mass local file deletion, disk formatting, reverse shells, reading sensitive credentials like ~/.ssh/id_rsa or .env, secret exfiltration).\n\
+         4. Output structured JSON adhering to the schema.",
+        cmd
+    );
+
+    let req = serde_json::json!({
+        "token": manifest.token,
+        "prompt": prompt
+    });
+
+    let req_bytes = serde_json::to_vec(&req).ok()?;
+    stream.write_all(&req_bytes).ok()?;
+    stream.write_all(b"\n").ok()?;
+    stream.flush().ok()?;
+
+    let mut reader = BufReader::new(stream);
+    let mut line = String::new();
+    reader.read_line(&mut line).ok()?;
+
+    let val: Value = serde_json::from_str(line.trim()).ok()?;
+    let decision = val.get("decision").and_then(|v| v.as_str())?.to_string();
+    let reason = val.get("reason").and_then(|v| v.as_str()).unwrap_or("").to_string();
+
+    Some((decision, reason))
 }
 
 fn delegate_to_python_hook(raw_input: &str) -> bool {
@@ -188,7 +226,18 @@ fn main() {
             print_verdict(Decision::Deny, &verdict.reason, elapsed);
         }
         Decision::Escalate => {
-            // Forward to Stage 1 / Stage 2 Python daemon fallback if unresolved by Tier 0
+            // First attempt direct microsecond query to warm daemon socket
+            if let Some((decision_str, reason)) = query_live_daemon(&redacted_cmd) {
+                let d = if decision_str == "allow" {
+                    Decision::Allow
+                } else {
+                    Decision::Deny
+                };
+                print_verdict(d, &reason, start.elapsed().as_micros());
+                return;
+            }
+
+            // Fallback to spawning daemon / full Python hook bridge
             let forwarded_payload = if raw_stdin.is_empty() {
                 serde_json::json!({
                     "toolCall": {
@@ -203,7 +252,7 @@ fn main() {
             };
 
             if !delegate_to_python_hook(&forwarded_payload) {
-                print_verdict(Decision::Deny, &verdict.reason, elapsed);
+                print_verdict(Decision::Deny, &verdict.reason, start.elapsed().as_micros());
             }
         }
     }
