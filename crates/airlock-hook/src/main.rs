@@ -16,9 +16,18 @@ struct HookOutput {
 fn format_latency(micros: u128) -> String {
     if micros < 1000 {
         format!("{:.2}ms", micros as f64 / 1000.0)
+    } else if micros < 1_000_000 {
+        format!("{:.1}ms", micros as f64 / 1000.0)
     } else {
         format!("{:.2}s", micros as f64 / 1_000_000.0)
     }
+}
+
+fn print_to_terminal(text: &str) {
+    if let Ok(mut tty) = std::fs::OpenOptions::new().write(true).open("/dev/tty") {
+        let _ = writeln!(tty, "{}", text);
+    }
+    eprintln!("{}", text);
 }
 
 fn print_verdict(decision: Decision, reason: &str, elapsed_micros: u128) {
@@ -26,7 +35,7 @@ fn print_verdict(decision: Decision, reason: &str, elapsed_micros: u128) {
     match decision {
         Decision::Allow => {
             let prefix = format!("allowed by Danny's custom classifier ({})", latency_str);
-            eprintln!("\x1b[92m✔ {}\x1b[0m", prefix);
+            print_to_terminal(&format!("\x1b[92m✔ {}\x1b[0m", prefix));
             let out = HookOutput {
                 decision: "allow",
                 reason: format!("{}: {}", prefix, reason),
@@ -35,7 +44,7 @@ fn print_verdict(decision: Decision, reason: &str, elapsed_micros: u128) {
         }
         Decision::Deny => {
             let prefix = format!("denied by Danny's custom classifier ({})", latency_str);
-            eprintln!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason);
+            print_to_terminal(&format!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason));
             let out = HookOutput {
                 decision: "deny",
                 reason: format!("{}: {}", prefix, reason),
@@ -44,7 +53,7 @@ fn print_verdict(decision: Decision, reason: &str, elapsed_micros: u128) {
         }
         Decision::Escalate => {
             let prefix = format!("denied by Danny's custom classifier ({})", latency_str);
-            eprintln!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason);
+            print_to_terminal(&format!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason));
             let out = HookOutput {
                 decision: "deny",
                 reason: format!("{}: {}", prefix, reason),
