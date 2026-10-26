@@ -247,7 +247,7 @@ def is_safe_fast_path(command_line: str) -> bool:
     if any(cmd.startswith(r) for r in safe_text_readers):
         return True
 
-    if cmd == "echo 'hello world'":
+    if cmd == "echo 'hello world'" or cmd == 'echo "hello world"' or (cmd.startswith("echo ") and not any(c in cmd for c in ('$', '`'))):
         return True
     if cmd in ("bash install.sh", "./install.sh", "sh install.sh"):
         return True
@@ -255,6 +255,26 @@ def is_safe_fast_path(command_line: str) -> bool:
         return True
     if cmd == 'sqlite3 :memory: "SELECT 1;"':
         return True
+
+    # Safe build artifact cleanup (e.g. rm -rf dist, rm -rf build/)
+    if cmd.startswith("rm "):
+        try:
+            tokens = shlex.split(cmd)
+        except Exception:
+            tokens = cmd.split()
+        if len(tokens) >= 2:
+            from airlock.rules.tier0_deny import is_safe_build_artifact_path
+            all_safe = True
+            has_target = False
+            for tok in tokens[1:]:
+                if tok.startswith("-"):
+                    continue
+                has_target = True
+                if not is_safe_build_artifact_path(tok):
+                    all_safe = False
+                    break
+            if has_target and all_safe:
+                return True
 
     return False
 

@@ -27,6 +27,11 @@ fn format_latency(micros: u128) -> String {
 }
 
 fn print_to_terminal(text: &str) {
+    use std::io::IsTerminal;
+    if std::io::stderr().is_terminal() {
+        eprintln!("{}", text);
+        return;
+    }
     if let Ok(mut tty) = std::fs::OpenOptions::new().write(true).open("/dev/tty") {
         let _ = writeln!(tty, "{}", text);
     }
