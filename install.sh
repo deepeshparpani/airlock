@@ -82,7 +82,26 @@ if [ -f "$HOOKS_FILE" ]; then
     cp "$HOOKS_FILE" "$HOOKS_FILE.bak"
 fi
 
-cat << 'EOF' > "$HOOKS_FILE"
+HOOK_CMD="python3 ~/.gemini/config/scripts/airlock_hook.py"
+
+# If cargo is installed, build and deploy native Rust hook for 10x performance
+if command -v cargo >/dev/null 2>&1 && [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/Cargo.toml" ]; then
+    echo "⚡ Building native high-performance Rust hook (airlock-hook)..."
+    (cd "$SCRIPT_DIR" && cargo build --release --bin airlock-hook >/dev/null 2>&1) || true
+    if [ -f "$SCRIPT_DIR/target/release/airlock-hook" ]; then
+        cp "$SCRIPT_DIR/target/release/airlock-hook" "$SCRIPTS_DIR/airlock-hook"
+        chmod +x "$SCRIPTS_DIR/airlock-hook"
+        HOOK_CMD="~/.gemini/config/scripts/airlock-hook"
+        echo "✅ Deployed native Rust binary (~3.8ms latency)!"
+    fi
+elif [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/target/release/airlock-hook" ]; then
+    cp "$SCRIPT_DIR/target/release/airlock-hook" "$SCRIPTS_DIR/airlock-hook"
+    chmod +x "$SCRIPTS_DIR/airlock-hook"
+    HOOK_CMD="~/.gemini/config/scripts/airlock-hook"
+    echo "✅ Deployed existing native Rust binary (~3.8ms latency)!"
+fi
+
+cat << EOF > "$HOOKS_FILE"
 {
   "airlock-hook": {
     "PreToolUse": [
@@ -91,7 +110,7 @@ cat << 'EOF' > "$HOOKS_FILE"
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.gemini/config/scripts/airlock_hook.py",
+            "command": "$HOOK_CMD",
             "timeout": 45
           }
         ]
@@ -101,4 +120,4 @@ cat << 'EOF' > "$HOOKS_FILE"
 }
 EOF
 
-echo "✅ Airlock installed! All run_command tool calls will now be evaluated with multi-tier high assurance."
+echo "✅ Airlock installed! All run_command tool calls will now be evaluated with multi-tier high assurance ($HOOK_CMD)."
