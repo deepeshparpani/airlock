@@ -228,7 +228,7 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
         }
     }
 
-    if cmd == "echo 'hello world'" {
+    if cmd == "echo 'hello world'" || cmd == r#"echo "hello world""# || (cmd.starts_with("echo ") && !cmd.contains('$') && !cmd.contains('`')) {
         return true;
     }
     if cmd == "bash install.sh" || cmd == "./install.sh" || cmd == "sh install.sh" {
