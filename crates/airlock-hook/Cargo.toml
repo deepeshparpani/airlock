@@ -1,0 +1,15 @@
+[package]
+name = "airlock-hook"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "airlock-hook"
+path = "src/main.rs"
+
+[dependencies]
+airlock-core = { path = "../airlock-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }

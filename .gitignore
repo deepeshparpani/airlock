@@ -23,3 +23,6 @@ htmlcov/
 # System Artifacts
 .DS_Store
 Thumbs.db
+
+# Rust Build Artifacts
+target/

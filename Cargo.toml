@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "crates/airlock-core",
+    "crates/airlock-hook",
+    "crates/airlock-daemon",
+]
+resolver = "2"
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+authors = ["Deepesh Parpani <deepesh.parpani@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/deepeshparpani/airlock"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+regex = "1.10"
+shlex = "1.3"
