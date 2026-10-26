@@ -1,4 +1,6 @@
-use airlock_core::{evaluate_tier0, redact_secrets, Decision, PortManifest};
+use airlock_core::{
+    evaluate_tier0, get_socket_path, redact_secrets, Decision, PortManifest,
+};
 use serde::Serialize;
 use serde_json::Value;
 use std::env;
@@ -43,16 +45,7 @@ fn print_verdict(decision: Decision, reason: &str, elapsed_micros: u128) {
             };
             println!("{}", serde_json::to_string(&out).unwrap());
         }
-        Decision::Deny => {
-            let prefix = format!("denied by Danny's custom classifier ({})", latency_str);
-            print_to_terminal(&format!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason));
-            let out = HookOutput {
-                decision: "deny",
-                reason: format!("{}: {}", prefix, reason),
-            };
-            println!("{}", serde_json::to_string(&out).unwrap());
-        }
-        Decision::Escalate => {
+        Decision::Deny | Decision::Escalate => {
             let prefix = format!("denied by Danny's custom classifier ({})", latency_str);
             print_to_terminal(&format!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason));
             let out = HookOutput {
@@ -91,15 +84,18 @@ fn extract_command_from_payload(raw: &str) -> Option<String> {
     None
 }
 
-/// Attempts to query the warm background daemon over loopback TCP with authentication token
+/// Queries the warm background daemon over Unix domain socket or loopback TCP
 fn query_live_daemon(cmd: &str) -> Option<(String, String)> {
     let manifest = PortManifest::read_current()?;
-    let addr = SocketAddr::from(([127, 0, 0, 1], manifest.port));
-    let mut stream = TcpStream::connect_timeout(&addr, Duration::from_millis(500)).ok()?;
-    stream.set_read_timeout(Some(Duration::from_secs(30))).ok()?;
-    stream.set_write_timeout(Some(Duration::from_secs(5))).ok()?;
 
-    let nonce = format!("{:08x}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos() & 0xFFFFFFFF);
+    let nonce = format!(
+        "{:08x}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos()
+            & 0xFFFFFFFF
+    );
     let close_tag = format!("</untrusted_command_{}>", nonce);
     let sanitized_cmd = cmd.replace(&close_tag, "[DELIMITER_REMOVED]");
 
@@ -126,6 +122,44 @@ fn query_live_daemon(cmd: &str) -> Option<(String, String)> {
     });
 
     let req_bytes = serde_json::to_vec(&req).ok()?;
+
+    // 1. Try Unix Domain Socket first (<10 microsecond IPC)
+    #[cfg(unix)]
+    {
+        let sock_path = get_socket_path();
+        if sock_path.exists() {
+            if let Ok(mut stream) = std::os::unix::net::UnixStream::connect(&sock_path) {
+                let _ = stream.set_read_timeout(Some(Duration::from_secs(30)));
+                let _ = stream.set_write_timeout(Some(Duration::from_secs(5)));
+                if stream.write_all(&req_bytes).is_ok()
+                    && stream.write_all(b"\n").is_ok()
+                    && stream.flush().is_ok()
+                {
+                    let mut reader = BufReader::new(stream);
+                    let mut line = String::new();
+                    if reader.read_line(&mut line).is_ok() {
+                        if let Ok(val) = serde_json::from_str::<Value>(line.trim()) {
+                            if let Some(decision) = val.get("decision").and_then(|v| v.as_str()) {
+                                let reason = val
+                                    .get("reason")
+                                    .and_then(|v| v.as_str())
+                                    .unwrap_or("")
+                                    .to_string();
+                                return Some((decision.to_string(), reason));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. Fallback to loopback TCP
+    let addr = SocketAddr::from(([127, 0, 0, 1], manifest.port));
+    let mut stream = TcpStream::connect_timeout(&addr, Duration::from_millis(500)).ok()?;
+    stream.set_read_timeout(Some(Duration::from_secs(30))).ok()?;
+    stream.set_write_timeout(Some(Duration::from_secs(5))).ok()?;
+
     stream.write_all(&req_bytes).ok()?;
     stream.write_all(b"\n").ok()?;
     stream.flush().ok()?;
@@ -183,6 +217,69 @@ fn delegate_to_python_hook(raw_input: &str) -> bool {
     }
 }
 
+fn print_help() {
+    println!(
+        "\x1b[1mAirlock\x1b[0m 1.0.0 - Autonomous AI Agent Security Mesh & Classifier\n\n\
+         \x1b[1mUSAGE:\x1b[0m\n    \
+             airlock exec -- <COMMAND>...    Execute a command under Airlock security policy\n    \
+             airlock check <COMMAND>...      Evaluate a command and print structured JSON verdict\n    \
+             airlock --cmd <COMMAND>         Evaluate a command string\n    \
+             airlock                         Run in stdin hook mode (for agent PreToolUse integrations)\n\n\
+         \x1b[1mOPTIONS:\x1b[0m\n    \
+             -h, --help       Print this help guide\n    \
+             -V, --version    Print version information\n\n\
+         \x1b[1mEXAMPLES:\x1b[0m\n    \
+             airlock exec -- cargo test\n    \
+             airlock exec -- npm run build\n    \
+             airlock check rm -rf /\n    \
+             echo '{{\"toolCall\":{{\"args\":{{\"CommandLine\":\"ls -la\"}}}}}}' | airlock"
+    );
+}
+
+fn print_version() {
+    println!("airlock 1.0.0 ({}-{}) [Rust native engine]", env::consts::ARCH, env::consts::OS);
+}
+
+fn evaluate_command_intent(cmd: &str, raw_stdin: &str) -> (Decision, String) {
+    let (redacted_cmd, _) = redact_secrets(cmd);
+    let verdict = evaluate_tier0(&redacted_cmd);
+
+    match verdict.decision {
+        Decision::Allow => (Decision::Allow, verdict.reason),
+        Decision::Deny => (Decision::Deny, verdict.reason),
+        Decision::Escalate => {
+            if let Some((decision_str, reason)) = query_live_daemon(&redacted_cmd) {
+                let d = if decision_str == "allow" {
+                    Decision::Allow
+                } else {
+                    Decision::Deny
+                };
+                return (d, reason);
+            }
+
+            let forwarded_payload = if raw_stdin.is_empty() {
+                serde_json::json!({
+                    "toolCall": {
+                        "name": "run_command",
+                        "args": {
+                            "CommandLine": cmd
+                        }
+                    }
+                })
+                .to_string()
+            } else {
+                raw_stdin.to_string()
+            };
+
+            if delegate_to_python_hook(&forwarded_payload) {
+                (Decision::Allow, "Allowed via classifier escalation".to_string())
+            } else {
+                (Decision::Deny, verdict.reason)
+            }
+        }
+    }
+}
+
 fn main() {
     let start = Instant::now();
 
@@ -195,14 +292,54 @@ fn main() {
     }
 
     let args: Vec<String> = env::args().collect();
+
+    // Handle help and version flags
+    if args.len() > 1 {
+        match args[1].as_str() {
+            "-h" | "--help" | "help" => {
+                print_help();
+                return;
+            }
+            "-V" | "--version" | "version" => {
+                print_version();
+                return;
+            }
+            _ => {}
+        }
+    }
+
+    let mut is_exec_mode = false;
     let mut command: Option<String> = None;
     let mut raw_stdin = String::new();
 
-    if args.len() > 2 && args[1] == "--cmd" {
-        command = Some(args[2].clone());
-    } else if args.len() > 1 && !args[1].starts_with('-') {
-        command = Some(args[1..].join(" "));
-    } else {
+    if args.len() > 1 {
+        if args[1] == "exec" {
+            is_exec_mode = true;
+            let sub_args: Vec<String> = if args.len() > 2 && args[2] == "--" {
+                args[3..].to_vec()
+            } else {
+                args[2..].to_vec()
+            };
+            if !sub_args.is_empty() {
+                command = Some(sub_args.join(" "));
+            }
+        } else if args[1] == "check" {
+            let sub_args: Vec<String> = if args.len() > 2 && args[2] == "--" {
+                args[3..].to_vec()
+            } else {
+                args[2..].to_vec()
+            };
+            if !sub_args.is_empty() {
+                command = Some(sub_args.join(" "));
+            }
+        } else if args[1] == "--cmd" && args.len() > 2 {
+            command = Some(args[2].clone());
+        } else if !args[1].starts_with('-') {
+            command = Some(args[1..].join(" "));
+        }
+    }
+
+    if command.is_none() {
         if let Ok(_) = io::stdin().read_to_string(&mut raw_stdin) {
             let trimmed = raw_stdin.trim();
             if !trimmed.is_empty() {
@@ -223,46 +360,38 @@ fn main() {
         }
     };
 
-    let (redacted_cmd, _) = redact_secrets(&cmd);
-    let verdict = evaluate_tier0(&redacted_cmd);
+    let (decision, reason) = evaluate_command_intent(&cmd, &raw_stdin);
     let elapsed = start.elapsed().as_micros();
 
-    match verdict.decision {
-        Decision::Allow => {
-            print_verdict(Decision::Allow, &verdict.reason, elapsed);
-        }
-        Decision::Deny => {
-            print_verdict(Decision::Deny, &verdict.reason, elapsed);
-        }
-        Decision::Escalate => {
-            // First attempt direct microsecond query to warm daemon socket
-            if let Some((decision_str, reason)) = query_live_daemon(&redacted_cmd) {
-                let d = if decision_str == "allow" {
-                    Decision::Allow
-                } else {
-                    Decision::Deny
-                };
-                print_verdict(d, &reason, start.elapsed().as_micros());
-                return;
+    if is_exec_mode {
+        match decision {
+            Decision::Allow => {
+                let latency_str = format_latency(elapsed);
+                let prefix = format!("allowed by Danny's custom classifier ({})", latency_str);
+                print_to_terminal(&format!("\x1b[92m✔ {}\x1b[0m", prefix));
+
+                #[cfg(unix)]
+                {
+                    use std::os::unix::process::CommandExt;
+                    let err = Command::new("sh").arg("-c").arg(&cmd).exec();
+                    eprintln!("airlock: failed to execute command: {}", err);
+                    std::process::exit(1);
+                }
+                #[cfg(not(unix))]
+                {
+                    let status = Command::new("cmd").args(["/C", &cmd]).status();
+                    std::process::exit(status.map(|s| s.code().unwrap_or(1)).unwrap_or(1));
+                }
             }
-
-            // Fallback to spawning daemon / full Python hook bridge
-            let forwarded_payload = if raw_stdin.is_empty() {
-                serde_json::json!({
-                    "toolCall": {
-                        "name": "run_command",
-                        "args": {
-                            "CommandLine": cmd
-                        }
-                    }
-                }).to_string()
-            } else {
-                raw_stdin
-            };
-
-            if !delegate_to_python_hook(&forwarded_payload) {
-                print_verdict(Decision::Deny, &verdict.reason, start.elapsed().as_micros());
+            Decision::Deny | Decision::Escalate => {
+                let latency_str = format_latency(elapsed);
+                let prefix = format!("denied by Danny's custom classifier ({})", latency_str);
+                print_to_terminal(&format!("\x1b[91m✖ {}: {}\x1b[0m", prefix, reason));
+                eprintln!("\x1b[91mairlock: execution blocked by security policy\x1b[0m");
+                std::process::exit(1);
             }
         }
+    } else {
+        print_verdict(decision, &reason, elapsed);
     }
 }

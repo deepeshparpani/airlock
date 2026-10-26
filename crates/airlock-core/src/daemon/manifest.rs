@@ -9,6 +9,11 @@ pub fn get_port_file_path() -> PathBuf {
     env::temp_dir().join(format!("airlock_daemon_{}.port", user))
 }
 
+pub fn get_socket_path() -> PathBuf {
+    let user = env::var("USER").unwrap_or_else(|_| "default".to_string());
+    env::temp_dir().join(format!("airlock_daemon_{}.sock", user))
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PortManifest {
     pub port: u16,

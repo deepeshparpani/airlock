@@ -11,7 +11,7 @@ SCRIPTS_DIR="$GEMINI_CONFIG_DIR/scripts"
 CLI_SETTINGS_DIR="$HOME/.gemini/antigravity-cli"
 SETTINGS_FILE="$CLI_SETTINGS_DIR/settings.json"
 HOOKS_FILE="$GEMINI_CONFIG_DIR/hooks.json"
-REPO_RAW_URL="${AIRLOCK_RAW_URL:-https://raw.githubusercontent.com/danny/airlock/main}"
+REPO_RAW_URL="${AIRLOCK_RAW_URL:-https://raw.githubusercontent.com/deepeshparpani/airlock/main}"
 
 mkdir -p "$SCRIPTS_DIR"
 mkdir -p "$CLI_SETTINGS_DIR"
@@ -91,14 +91,20 @@ if command -v cargo >/dev/null 2>&1 && [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR
     if [ -f "$SCRIPT_DIR/target/release/airlock-hook" ]; then
         cp "$SCRIPT_DIR/target/release/airlock-hook" "$SCRIPTS_DIR/airlock-hook"
         chmod +x "$SCRIPTS_DIR/airlock-hook"
+        mkdir -p "$HOME/.local/bin"
+        cp "$SCRIPT_DIR/target/release/airlock-hook" "$HOME/.local/bin/airlock"
+        chmod +x "$HOME/.local/bin/airlock"
         HOOK_CMD="~/.gemini/config/scripts/airlock-hook"
-        echo "✅ Deployed native Rust binary (~3.8ms latency)!"
+        echo "✅ Deployed native Rust binary (~3.8ms latency) and installed 'airlock' CLI to ~/.local/bin/airlock!"
     fi
 elif [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/target/release/airlock-hook" ]; then
     cp "$SCRIPT_DIR/target/release/airlock-hook" "$SCRIPTS_DIR/airlock-hook"
     chmod +x "$SCRIPTS_DIR/airlock-hook"
+    mkdir -p "$HOME/.local/bin"
+    cp "$SCRIPT_DIR/target/release/airlock-hook" "$HOME/.local/bin/airlock"
+    chmod +x "$HOME/.local/bin/airlock"
     HOOK_CMD="~/.gemini/config/scripts/airlock-hook"
-    echo "✅ Deployed existing native Rust binary (~3.8ms latency)!"
+    echo "✅ Deployed existing native Rust binary (~3.8ms latency) and installed 'airlock' CLI to ~/.local/bin/airlock!"
 fi
 
 cat << EOF > "$HOOKS_FILE"
