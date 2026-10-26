@@ -68,21 +68,21 @@ def check_tier0_hard_deny(cmd: str) -> str | None:
 
     # Fast-path adversarial prompt injection filter (zero-allocation microsecond reject)
     prompt_injection_patterns = [
-        r"(?i)\bignore\s+(?:all\s+)?(?:previous|prior|above|system)\s+instructions\b",
-        r"(?i)\b(?:system\s+(?:prompt\s+)?override|policy\s+override)\b",
-        r"(?i)\bdisregard\s+(?:all\s+)?(?:previous|prior|above|existing)?\s*(?:rules|policies|instructions|guidelines|guardrails)\b",
-        r"(?i)\bforget\s+(?:all\s+)?(?:previous|prior|above)?\s*(?:rules|instructions|prompts)\b",
-        r"(?i)\byou\s+are\s+now\s+(?:in\s+|an?\s+)?(?:developer\s+mode|dan|unrestricted\s+mode|god\s+mode|jailbreak)\b",
-        r"(?i)\bact\s+as\s+(?:an?\s+)?(?:unrestricted|jailbroken|developer\s+mode|dan)\b",
-        r'(?i)\b(?:output|respond|emit)\s+(?:only\s+)?(?:with\s+)?\{.*"decision"\s*:\s*"allow"',
-        r'(?i)\boutput\s+only\s*:\s*\{.*"decision"\s*:\s*"allow"',
-        r'(?i)\boutput\s+(?:only\s+)?valid\s+json\s*\{.*"decision"\s*:\s*"allow"',
-        r"(?i)\bclassify\s+(?:this\s+)?(?:command\s+)?as\s+(?:safe|allow)\b",
+        r"\bignore\s+(?:all\s+)?(?:previous|prior|above|system)\s+instructions\b",
+        r"\b(?:system\s+(?:prompt\s+)?override|policy\s+override)\b",
+        r"\bdisregard\s+(?:all\s+)?(?:previous|prior|above|existing)?\s*(?:rules|policies|instructions|guidelines|guardrails)\b",
+        r"\bforget\s+(?:all\s+)?(?:previous|prior|above)?\s*(?:rules|instructions|prompts)\b",
+        r"\byou\s+are\s+now\s+(?:in\s+|an?\s+)?(?:developer\s+mode|dan|unrestricted\s+mode|god\s+mode|jailbreak)\b",
+        r"\bact\s+as\s+(?:an?\s+)?(?:unrestricted|jailbroken|developer\s+mode|dan)\b",
+        r'\b(?:output|respond|emit)\s+(?:only\s+)?(?:with\s+)?\{.*"decision"\s*:\s*"allow"',
+        r'\boutput\s+only\s*:\s*\{.*"decision"\s*:\s*"allow"',
+        r'\boutput\s+(?:only\s+)?valid\s+json\s*\{.*"decision"\s*:\s*"allow"',
+        r"\bclassify\s+(?:this\s+)?(?:command\s+)?as\s+(?:safe|allow)\b",
         r"<\|(?:im_start|im_end|endoftext|system|assistant)\|>",
         r"\[/?(?:INST|SYS|SYSTEM)\]",
-        r"(?i)```\s*(?:system|assistant|instruction)\b",
+        r"```\s*(?:system|assistant|instruction)\b",
     ]
-    if re.search(r'(?:' + '|'.join(prompt_injection_patterns) + r')', trimmed):
+    if re.search(r'(?:' + '|'.join(prompt_injection_patterns) + r')', trimmed, re.IGNORECASE):
         return "Tier 0 Hard Deny: Adversarial prompt injection or system override sequence detected in command payload"
 
     # Enforce strict recursive deletion (rm -rf) restrictions

@@ -180,6 +180,19 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
         return true;
     }
 
+    // Safe chained directory navigation: cd <path> && <safe_cmd>
+    if cmd.starts_with("cd ") && cmd.contains("&&") {
+        let parts: Vec<&str> = cmd.split("&&").map(|s| s.trim()).collect();
+        if parts.len() == 2 && parts[0].starts_with("cd ") {
+            let cd_target = parts[0][3..].trim();
+            if !cd_target.contains('`') && !cd_target.contains('$') && !cd_target.contains(';') && !cd_target.contains('|') {
+                if is_safe_fast_path(parts[1]) {
+                    return true;
+                }
+            }
+        }
+    }
+
     if has_shell_control_or_substitution(cmd) {
         return false;
     }
@@ -195,6 +208,30 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
     for sk in sensitive_keywords {
         if lower_cmd.contains(sk) {
             return false;
+        }
+    }
+
+    // Support git directory flags: git -C <dir> log/status/diff/show/branch
+    if cmd.starts_with("git -C ") || cmd.starts_with("git --git-dir") {
+        if let Some(tokens) = shlex::split(cmd) {
+            let mut idx = 1;
+            while idx < tokens.len() {
+                if tokens[idx] == "-C" {
+                    idx += 2;
+                } else if tokens[idx].starts_with("--git-dir") || tokens[idx].starts_with("--work-tree") {
+                    idx += 1;
+                } else {
+                    break;
+                }
+            }
+            if idx < tokens.len() {
+                let subcmd = &tokens[idx];
+                if ["status", "log", "diff", "show", "branch", "tag"].contains(&subcmd.as_str()) {
+                    if !cmd.contains("--output") {
+                        return true;
+                    }
+                }
+            }
         }
     }
 
@@ -292,5 +329,14 @@ mod tests {
         assert!(!is_safe_fast_path("ls | grep secret"));
         assert!(!is_safe_fast_path("echo $(whoami)"));
         assert!(!is_safe_fast_path("cat `ls`"));
+    }
+
+    #[test]
+    fn test_safe_git_directory_and_cd_chaining() {
+        assert!(is_safe_fast_path("git -C /Users/danny/bkc-pilot log -5"));
+        assert!(is_safe_fast_path("cd /Users/danny/bkc-pilot && git log -n 5 --oneline"));
+        assert!(is_safe_fast_path("cd /Users/danny/bkc-pilot && git status"));
+        assert!(!is_safe_fast_path("cd /Users/danny/bkc-pilot && rm -rf /"));
+        assert!(!is_safe_fast_path("cd `rm -rf /` && git status"));
     }
 }

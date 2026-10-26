@@ -129,6 +129,15 @@ def is_safe_fast_path(command_line: str) -> bool:
     if is_safe_cluster_inspection(cmd):
         return True
 
+    # Safe chained directory navigation: cd <path> && <safe_cmd>
+    if cmd.startswith("cd ") and "&&" in cmd:
+        parts = [s.strip() for s in cmd.split("&&")]
+        if len(parts) == 2 and parts[0].startswith("cd "):
+            cd_target = parts[0][3:].strip()
+            if not any(c in cd_target for c in ('`', '$', ';', '|')):
+                if is_safe_fast_path(parts[1]):
+                    return True
+
     if has_shell_control_or_substitution(cmd):
         return False
 
@@ -142,6 +151,27 @@ def is_safe_fast_path(command_line: str) -> bool:
     )
     if any(sk in lower_cmd for sk in sensitive_keywords):
         return False
+
+    # Support git directory flags: git -C <dir> log/status/diff/show/branch
+    if cmd.startswith("git -C ") or cmd.startswith("git --git-dir"):
+        try:
+            import shlex
+            tokens = shlex.split(cmd)
+            idx = 1
+            while idx < len(tokens):
+                if tokens[idx] == "-C":
+                    idx += 2
+                elif tokens[idx].startswith("--git-dir") or tokens[idx].startswith("--work-tree"):
+                    idx += 1
+                else:
+                    break
+            if idx < len(tokens):
+                subcmd = tokens[idx]
+                if subcmd in ("status", "log", "diff", "show", "branch", "tag"):
+                    if "--output" not in cmd:
+                        return True
+        except Exception:
+            pass
 
     safe_read_commands = (
         "ls", "pwd", "whoami", "git status", "git log", "git diff", "git show",

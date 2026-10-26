@@ -175,7 +175,7 @@ fn query_live_daemon(cmd: &str) -> Option<(String, String)> {
     Some((decision, reason))
 }
 
-fn delegate_to_python_hook(raw_input: &str) -> bool {
+fn delegate_to_python_hook(raw_input: &str) -> Option<(Decision, String)> {
     let home = env::var("HOME").unwrap_or_default();
     let script_paths = [
         format!("{}/.gemini/config/scripts/airlock_hook.py", home),
@@ -191,30 +191,43 @@ fn delegate_to_python_hook(raw_input: &str) -> bool {
         }
     }
 
-    let script = match target_script {
-        Some(s) => s,
-        None => return false,
-    };
+    let script = target_script?;
 
-    let mut child = match Command::new("python3")
+    let mut child = Command::new("python3")
         .arg(&script)
         .stdin(Stdio::piped())
-        .stdout(Stdio::inherit())
+        .stdout(Stdio::piped()) // Capture stdout to prevent duplicate JSON streams
         .stderr(Stdio::inherit())
         .spawn()
-    {
-        Ok(c) => c,
-        Err(_) => return false,
-    };
+        .ok()?;
 
     if let Some(mut stdin) = child.stdin.take() {
         let _ = stdin.write_all(raw_input.as_bytes());
     }
 
-    match child.wait() {
-        Ok(status) => status.success(),
-        Err(_) => false,
+    let output = child.wait_with_output().ok()?;
+    let stdout_str = String::from_utf8_lossy(&output.stdout);
+
+    for line in stdout_str.lines() {
+        let trimmed = line.trim();
+        if let Ok(val) = serde_json::from_str::<Value>(trimmed) {
+            if let Some(dec_str) = val.get("decision").and_then(|v| v.as_str()) {
+                let reason = val
+                    .get("reason")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                let decision = if dec_str == "allow" {
+                    Decision::Allow
+                } else {
+                    Decision::Deny
+                };
+                return Some((decision, reason));
+            }
+        }
     }
+
+    None
 }
 
 fn print_help() {
@@ -271,8 +284,8 @@ fn evaluate_command_intent(cmd: &str, raw_stdin: &str) -> (Decision, String) {
                 raw_stdin.to_string()
             };
 
-            if delegate_to_python_hook(&forwarded_payload) {
-                (Decision::Allow, "Allowed via classifier escalation".to_string())
+            if let Some((decision, reason)) = delegate_to_python_hook(&forwarded_payload) {
+                (decision, reason)
             } else {
                 (Decision::Deny, verdict.reason)
             }
