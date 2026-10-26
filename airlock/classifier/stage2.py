@@ -7,7 +7,7 @@ import urllib.request
 import urllib.error
 
 from airlock.config import AIRLOCK_GEMINI_DIR, STAGE_2_SCHEMA, STAGE_2_SCHEMA_STR
-from airlock.utils import extract_json_payload
+from airlock.utils import extract_json_payload, get_headless_env
 from airlock.daemon.process import setup_isolated_gemini_dir
 
 CLUSTER_SECURITY_GUIDANCE = (
@@ -107,8 +107,7 @@ def escalate_to_stage2(cmd: str, stage1_thinking: str, stage1_reason: str) -> di
 
     # 3. Fallback to agy one-shot with Stage 2 schema
     setup_isolated_gemini_dir()
-    eval_env = os.environ.copy()
-    eval_env["AGY_HOOK_BYPASS"] = "1"
+    eval_env = get_headless_env()
     prompt = (
         "IMPORTANT: You are a senior security reviewer. Output ONLY structured JSON conforming to the schema. "
         "Do NOT call any tools under any circumstance.\n\n"

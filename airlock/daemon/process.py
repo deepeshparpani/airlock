@@ -110,11 +110,10 @@ def kill_other_daemons():
             pass
 
 def spawn_agy():
+    from airlock.utils import get_headless_env
     setup_isolated_gemini_dir()
     kill_stale_workers()
-    env = os.environ.copy()
-    env["AGY_HOOK_BYPASS"] = "1"
-    env["AIRLOCK_HOOK_BYPASS"] = "1"
+    env = get_headless_env()
     proc = subprocess.Popen(
         [
             "agy",
@@ -124,7 +123,7 @@ def spawn_agy():
             f"--json-schema={STAGE_1_SCHEMA_STR}",
             "--model", "gemini-3.8-flash-low"
         ],
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=env, cwd=tempfile.gettempdir()
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, env=env, cwd=tempfile.gettempdir()
     )
     while True:
         line = proc.stdout.readline()

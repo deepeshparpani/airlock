@@ -71,3 +71,28 @@ def extract_json_payload(text: str):
         except Exception:
             pass
     return None
+
+def get_headless_env() -> dict:
+    """Builds an isolated headless environment for background AI workers that never attaches to terminal emulators."""
+    import os
+    env = os.environ.copy()
+    env["AGY_HOOK_BYPASS"] = "1"
+    env["AIRLOCK_HOOK_BYPASS"] = "1"
+    env["TERM"] = "dumb"
+    for k in (
+        "ITERM_SESSION_ID",
+        "ITERM_PROFILE",
+        "TERM_PROGRAM",
+        "TERM_PROGRAM_VERSION",
+        "LC_TERMINAL",
+        "LC_TERMINAL_VERSION",
+        "COLORTERM",
+        "TERMINAL_EMULATOR",
+        "WINDOWID",
+        "KITTY_WINDOW_ID",
+        "GHOSTTY_RESOURCES_DIR",
+        "ALACRITTY_LOG",
+    ):
+        env.pop(k, None)
+    return env
+

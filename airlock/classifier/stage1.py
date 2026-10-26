@@ -8,7 +8,7 @@ import secrets
 import tempfile
 
 from airlock.config import PORT_FILE, AIRLOCK_GEMINI_DIR, MAX_RETRIES, STAGE_1_SCHEMA_STR
-from airlock.utils import is_network_error, extract_json_payload
+from airlock.utils import is_network_error, extract_json_payload, get_headless_env
 from airlock.daemon.process import setup_isolated_gemini_dir
 
 def get_daemon_conn():
@@ -35,9 +35,7 @@ def get_daemon_conn():
 
 def spawn_daemon(daemon_script: str | None = None):
     """Spawns background daemon process."""
-    eval_env = os.environ.copy()
-    eval_env["AGY_HOOK_BYPASS"] = "1"
-    eval_env["AIRLOCK_HOOK_BYPASS"] = "1"
+    eval_env = get_headless_env()
     
     if daemon_script and os.path.exists(daemon_script):
         cmd = [sys.executable, daemon_script]
@@ -118,8 +116,7 @@ def query_stage1_daemon(prompt: str, daemon_script: str | None = None) -> dict |
 def query_stage1_fallback(prompt: str) -> dict | None:
     """One-shot fallback if the persistent daemon is unavailable."""
     setup_isolated_gemini_dir()
-    eval_env = os.environ.copy()
-    eval_env["AGY_HOOK_BYPASS"] = "1"
+    eval_env = get_headless_env()
     stream_input = json.dumps({"event": "user", "message": {"content": prompt}}) + "\n"
 
     for attempt in range(MAX_RETRIES):

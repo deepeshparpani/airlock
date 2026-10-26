@@ -195,9 +195,24 @@ fn delegate_to_python_hook(raw_input: &str) -> Option<(Decision, String)> {
 
     let mut child = Command::new("python3")
         .arg(&script)
+        .env("TERM", "dumb")
+        .env("AGY_HOOK_BYPASS", "1")
+        .env("AIRLOCK_HOOK_BYPASS", "1")
+        .env_remove("ITERM_SESSION_ID")
+        .env_remove("ITERM_PROFILE")
+        .env_remove("TERM_PROGRAM")
+        .env_remove("TERM_PROGRAM_VERSION")
+        .env_remove("LC_TERMINAL")
+        .env_remove("LC_TERMINAL_VERSION")
+        .env_remove("COLORTERM")
+        .env_remove("TERMINAL_EMULATOR")
+        .env_remove("WINDOWID")
+        .env_remove("KITTY_WINDOW_ID")
+        .env_remove("GHOSTTY_RESOURCES_DIR")
+        .env_remove("ALACRITTY_LOG")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped()) // Capture stdout to prevent duplicate JSON streams
-        .stderr(Stdio::inherit())
+        .stderr(Stdio::null())
         .spawn()
         .ok()?;
 
