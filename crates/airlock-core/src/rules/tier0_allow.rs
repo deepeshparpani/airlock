@@ -241,6 +241,28 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
         return true;
     }
 
+    // Safe build artifact cleanup (e.g. rm -rf dist, rm -rf build/)
+    if cmd.starts_with("rm ") {
+        let tokens: Vec<String> = shlex::split(cmd).unwrap_or_default();
+        if tokens.len() >= 2 {
+            let mut all_safe = true;
+            let mut has_target = false;
+            for tok in &tokens[1..] {
+                if tok.starts_with('-') {
+                    continue;
+                }
+                has_target = true;
+                if !crate::rules::is_safe_build_artifact_path(tok) {
+                    all_safe = false;
+                    break;
+                }
+            }
+            if has_target && all_safe {
+                return true;
+            }
+        }
+    }
+
     false
 }
 

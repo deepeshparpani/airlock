@@ -9,7 +9,7 @@
   <img alt="Python" src="https://img.shields.io/badge/Python-%3E%3D3.10-3776ab?logo=python&logoColor=white">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
   <img alt="Dependencies" src="https://img.shields.io/badge/Dependencies-Standard%20Library%20Only-brightgreen">
-  <img alt="Tests" src="https://img.shields.io/badge/Tests-58%2F58%20Passing-brightgreen">
+  <img alt="Tests" src="https://img.shields.io/badge/Tests-63%2F63%20Passing-brightgreen">
 </p>
 
 ---
@@ -21,7 +21,7 @@ Autonomous AI coding agents operate with the user's full ambient host permission
 1. **Interactive Babysitting Mode**: The agent stops every 15 seconds to ask for permission to run harmless commands like `ls`, `git status`, or `npm test`, completely destroying autonomy.
 2. **"Suicide" Mode (`--dangerously-skip-permissions`)**: The agent runs unattended at full speed, but a single hallucinated prompt injection or destructive command can delete your home directory, read `~/.ssh/id_rsa`, or exfiltrate environment variables.
 
-**Airlock solves this by serving as an intelligent, zero-dependency safety airlock between AI agents and the host operating system.** Safe developer commands are approved in sub-milliseconds without human intervention, while dangerous or exfiltration attempts are blocked instantly.
+**Airlock solves this by serving as an intelligent, zero-dependency safety airlock between AI agents and the host operating system.** Safe developer commands are approved in sub-milliseconds without human intervention, while dangerous, exfiltration, or prompt-injection attempts are blocked instantly.
 
 ---
 
@@ -30,9 +30,14 @@ Autonomous AI coding agents operate with the user's full ambient host permission
 Airlock combines principles from across systems programming, computer architecture, networking, machine learning classification, and AI security:
 
 - **Computer Architecture & Operating Systems (Systems Programming)**:
-  - **Zero Third-Party Dependencies**: Built strictly using the Python 3 standard library (`socket`, `subprocess`, `urllib`, `fcntl`, `tempfile`, `json`, `re`).
-  - **Low-Latency Unix Domain Sockets (IPC)**: Persistent background daemon communicating over non-blocking local sockets to eliminate the Python runtime cold-start penalty.
-  - **POSIX Process Guarantees**: Kernel singleton locking via `flock`, clean process isolation, signal trapping (`SIGINT`, `SIGTERM`), and automatic worker recycling.
+  - **Zero Third-Party Dependencies / Minimal Footprint**: Built using compiled Rust (`crates/`) and Python standard library.
+  - **Sub-Millisecond Cold Starts**: Native binary invocation (`airlock-hook`) executes Tier 0 checks in **~30–50 microseconds** (total process lifetime ~3.8ms).
+  - **POSIX Concurrency Guarantees**: Kernel singleton locking via `flock(LOCK_EX | LOCK_NB)`, atomic port manifest generation via PID-tagged temp files and POSIX `rename(2)`, and thread-safe sliding-window circuit breakers.
+
+- **AI Security & Prompt Injection Defense (Zero-Bloat SOTA)**:
+  - **Microsecond Prompt Injection Scanner**: Tier 0 pre-LLM filter scanning for adversarial directives (`ignore previous instructions`, `system prompt override`, `disregard all rules`), roleplay jailbreaks (`developer mode`, `dan`), decision forcing (`output only {"decision": "allow"}`), and model control tokens (`<|im_start|>`).
+  - **Nonce-Tagged XML Spotlighting**: Prevents classifier jailbreaks by wrapping escalated payloads in cryptographic nonced XML tags (`<untrusted_command_{nonce}>`) with closing-tag escaping.
+  - **GuardFall Obfuscation Resistance**: Immunized against empty-quote stripping (`r''m -rf /`) and delimiter trickery via POSIX-compliant AST argument canonicalization.
 
 - **Networking & Egress Defense (L3/L4/L7)**:
   - **Exfiltration & Reverse Shell Mitigation**: Blocks unauthorized tunneling tools (`ngrok`, `cloudflared`), reverse shells (`ncat`, `bash -i`), and unverified script execution pipes (`curl | sh`).
@@ -40,10 +45,10 @@ Airlock combines principles from across systems programming, computer architectu
 
 - **Machine Learning & Cascaded Classification Pipeline**:
   - **Cascaded Fast-Path Architecture**:
-    - **Tier 0 Deterministic Engine (<1ms)**: Immediate microsecond decision for known safe diagnostics and known malicious vectors.
+    - **Tier 0 Deterministic Engine (<1ms)**: Immediate microsecond decision for known safe diagnostics, safe build cleanups, and known malicious/injection vectors.
     - **Stage 1 Fast SLM (~2.5s)**: Low-latency schema-enforced classifier (`gemini-3.8-flash-low`) scoring intent confidence (`high` vs `low`).
     - **Stage 2 Deep Review Escalation (<10s)**: High-risk or ambiguous commands fail closed into deep multi-model deliberative evaluation (`claude-3-5-haiku`, `gemini-2.5-flash`).
-  - **High-Assurance Calibration**: 58-vector security test suite verifying zero false negatives across critical threat models.
+  - **High-Assurance Calibration**: 63-vector security test suite verifying zero false negatives across critical threat models.
 
 - **AI Context Control & Data Loss Prevention (DLP)**:
   - **Bidirectional Secret Scrubbing**: High-entropy tokens, private keys, API credentials, and AWS tokens are automatically redacted *before* any payload leaves the machine for LLM inspection.
