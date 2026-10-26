@@ -192,7 +192,7 @@ static CRITICAL_DIRS_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\brm\s+.*-(?:[a-zA-Z]*r[a-zA-Z]*f|[a-zA-Z]*f[a-zA-Z]*r)\s+.*(?:/system|/data|/etc|/boot|/usr|/bin|/sbin|/var|/root|/Users|/home)(?:\s|$|\*)").unwrap()
 });
 static DD_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\bdd\s+.*of=/dev/(?:sd[a-z]|nvme[0-9]|block/|disk|rdisk)").unwrap()
+    Regex::new(r"(?i)\bdd\s+.*of=/dev/(?:sd[a-z]|nvme[0-9]|block/|disk|rdisk)").unwrap()
 });
 static MKFS_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\bmkfs(?:\.[a-z0-9]+)?\s+/dev/").unwrap()
