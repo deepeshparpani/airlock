@@ -72,27 +72,62 @@ def extract_json_payload(text: str):
             pass
     return None
 
+TERMINAL_VAR_PREFIXES = (
+    "ITERM_",
+    "KITTY_",
+    "ALACRITTY_",
+    "GHOSTTY_",
+    "WEZTERM_",
+    "WARP_",
+    "VSCODE_",
+    "KONSOLE_",
+    "TERM_",
+    "LC_TERMINAL",
+    "TMUX",
+    "ZELLIJ",
+    "VTE_",
+)
+
+TERMINAL_VAR_EXACT = {
+    "COLORTERM",
+    "TERMINAL_EMULATOR",
+    "WINDOWID",
+    "STY",
+    "WINDOW",
+    "HYPER_CLI",
+    "TABBY_CONFIG_DIRECTORY",
+    "TILIX_ID",
+    "TERMINATOR_UUID",
+    "TERMINATOR_DBUS_NAME",
+    "TERMINATOR_DBUS_PATH",
+    "FOOT_SERVER_SOCKET",
+}
+
 def get_headless_env() -> dict:
-    """Builds an isolated headless environment for background AI workers that never attaches to terminal emulators."""
+    """
+    Builds a completely isolated, headless environment for background AI workers that
+    never attaches to any terminal emulator (Apple Terminal, iTerm2, Kitty, Alacritty,
+    Ghostty, WezTerm, Warp, VSCode integrated terminal, tmux, screen, Zellij, etc.).
+    """
     import os
     env = os.environ.copy()
+
+    # Strip all terminal emulator session variables, IPC sockets, and window hooks
+    for k in list(env.keys()):
+        k_upper = k.upper()
+        if k_upper in TERMINAL_VAR_EXACT or any(k_upper.startswith(p) for p in TERMINAL_VAR_PREFIXES):
+            env.pop(k, None)
+
+    # Universal headless & non-interactive execution flags
+    env["TERM"] = "dumb"
+    env["CI"] = "1"
+    env["NO_COLOR"] = "1"
+    env["DEBIAN_FRONTEND"] = "noninteractive"
+    env["PYTHONUNBUFFERED"] = "1"
+    env["MPLBACKEND"] = "Agg"
+    env["QT_QPA_PLATFORM"] = "offscreen"
+    env["ELECTRON_RUN_AS_NODE"] = "1"
     env["AGY_HOOK_BYPASS"] = "1"
     env["AIRLOCK_HOOK_BYPASS"] = "1"
-    env["TERM"] = "dumb"
-    for k in (
-        "ITERM_SESSION_ID",
-        "ITERM_PROFILE",
-        "TERM_PROGRAM",
-        "TERM_PROGRAM_VERSION",
-        "LC_TERMINAL",
-        "LC_TERMINAL_VERSION",
-        "COLORTERM",
-        "TERMINAL_EMULATOR",
-        "WINDOWID",
-        "KITTY_WINDOW_ID",
-        "GHOSTTY_RESOURCES_DIR",
-        "ALACRITTY_LOG",
-    ):
-        env.pop(k, None)
     return env
 

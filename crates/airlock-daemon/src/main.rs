@@ -1,5 +1,6 @@
 use airlock_core::{
-    get_port_file_path, get_socket_path, CircuitBreaker, PortManifest, SingletonLock,
+    get_port_file_path, get_socket_path, should_strip_env_var, CircuitBreaker,
+    PortManifest, SingletonLock, HEADLESS_ENVS_TO_SET,
 };
 use serde::Deserialize;
 use serde_json::Value;
@@ -94,25 +95,24 @@ impl WorkerManager {
             .arg(format!("--json-schema={}", STAGE_1_SCHEMA))
             .arg("--model")
             .arg("gemini-3.8-flash-low")
-            .env("TERM", "dumb")
-            .env("AGY_HOOK_BYPASS", "1")
-            .env("AIRLOCK_HOOK_BYPASS", "1")
-            .env_remove("ITERM_SESSION_ID")
-            .env_remove("ITERM_PROFILE")
-            .env_remove("TERM_PROGRAM")
-            .env_remove("TERM_PROGRAM_VERSION")
-            .env_remove("LC_TERMINAL")
-            .env_remove("LC_TERMINAL_VERSION")
-            .env_remove("COLORTERM")
-            .env_remove("TERMINAL_EMULATOR")
-            .env_remove("WINDOWID")
-            .env_remove("KITTY_WINDOW_ID")
-            .env_remove("GHOSTTY_RESOURCES_DIR")
-            .env_remove("ALACRITTY_LOG")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::null())
             .current_dir(env::temp_dir());
+
+        // Strip all terminal emulator session variables across all terminals
+        for (k, _) in env::vars() {
+            if should_strip_env_var(&k) {
+                cmd.env_remove(k);
+            }
+        }
+        // Apply universal headless enforcement flags
+        for (k, v) in HEADLESS_ENVS_TO_SET {
+            cmd.env(k, v);
+        }
+
+        #[cfg(unix)]
+        cmd.process_group(0);
 
         let mut child = cmd.spawn()?;
 

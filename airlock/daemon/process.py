@@ -123,7 +123,13 @@ def spawn_agy():
             f"--json-schema={STAGE_1_SCHEMA_STR}",
             "--model", "gemini-3.8-flash-low"
         ],
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, env=env, cwd=tempfile.gettempdir()
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+        env=env,
+        cwd=tempfile.gettempdir(),
+        start_new_session=True,
     )
     while True:
         line = proc.stdout.readline()

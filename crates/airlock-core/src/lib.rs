@@ -3,7 +3,9 @@ pub mod daemon;
 pub mod redactor;
 pub mod rules;
 
-pub use config::{is_trusted_remote_host, SAFE_BUILD_ARTIFACT_NAMES};
+pub use config::{
+    is_trusted_remote_host, should_strip_env_var, HEADLESS_ENVS_TO_SET, SAFE_BUILD_ARTIFACT_NAMES,
+};
 pub use daemon::{get_port_file_path, get_socket_path, CircuitBreaker, PortManifest, SingletonLock};
 pub use redactor::redact_secrets;
 pub use rules::{
