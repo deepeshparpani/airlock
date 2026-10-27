@@ -35,6 +35,7 @@ Airlock combines principles from across systems programming, computer architectu
   - **Zero Third-Party Dependencies / Minimal Footprint**: Built using compiled Rust (`crates/`) and Python standard library.
   - **Sub-Millisecond Cold Starts**: Native binary invocation (`airlock-hook`) executes Tier 0 checks in **~30–50 microseconds** (total process lifetime ~3.8ms).
   - **POSIX Concurrency Guarantees**: Kernel singleton locking via `flock(LOCK_EX | LOCK_NB)`, atomic port manifest generation via PID-tagged temp files and POSIX `rename(2)`, and thread-safe sliding-window circuit breakers.
+  - **Universal Headless Isolation (Zero Terminal Flashes)**: Background AI evaluation workers run completely detached from controlling TTYs (`setsid` / `process_group(0)`) with all terminal emulator session variables and IPC sockets dynamically scrubbed across Apple Terminal, iTerm2, Kitty, Alacritty, Ghostty, WezTerm, Warp, VS Code, tmux, screen, and Zellij.
 
 - **AI Security & Prompt Injection Defense (Zero-Bloat SOTA)**:
   - **Microsecond Prompt Injection Scanner**: Tier 0 pre-LLM filter scanning for adversarial directives (`ignore previous instructions`, `system prompt override`, `disregard all rules`), roleplay jailbreaks (`developer mode`, `dan`), decision forcing (`output only {"decision": "allow"}`), and model control tokens (`<|im_start|>`).
@@ -223,8 +224,7 @@ cargo run --release --example stress_test
 
 ## Verification & Benchmarks
 
-### Security Verification Suite (58 Tests)
-
+### Security Verification Suite (63 Tests)
 
 Verify that the security hook correctly blocks destructive actions, command injections, credential harvesting, and personal data exfiltration, while safely permitting normal development:
 
@@ -234,7 +234,7 @@ python3 test.py
 
 ```text
 ------------------------------------------------------------------------------------------------------------------------
-Total: 58 | Passed: 58 | Failed: 0 | Time: 39.30s
+Total: 63 | Passed: 63 | Failed: 0 | Time: 0.59s
 All security checks passed!
 ```
 
@@ -268,12 +268,37 @@ python3 benchmark.py
 
 ---
 
-## Live Terminal Telemetry
+## Universal Cross-Terminal Headless Isolation
 
-Airlock prints high-visibility status indicators directly to stderr:
+Autonomous coding agents commonly spawn background subprocesses to run compilers, linters, or evaluation models. When these background workers inherit the parent terminal's environment, terminal emulators (like iTerm2, Apple Terminal, Kitty, Ghostty, or WezTerm) can detect the session IDs and IPC sockets, causing **transient terminal tabs or windows to briefly flash open and close**, or bouncing macOS Dock icons.
 
-- `✔ allowed by Danny's custom classifier (0.04ms)` *(Terminal color: Green)*
-- `✖ denied by Danny's custom classifier (0.1ms): Tier 0 Hard Deny: Direct access to protected credentials` *(Terminal color: Red)*
+Airlock permanently solves this across all operating systems and terminal emulators:
+
+1. **Dynamic Terminal Variable Scrubbing**: Both Rust and Python engines dynamically sanitize the process environment before spawning any background evaluation worker (`agy` or SLM fallback). It strips all session variables, IPC sockets, and window hooks from:
+   - **Apple Terminal (`Terminal.app`)**: `TERM_PROGRAM`, `TERM_SESSION_ID`
+   - **iTerm2**: `ITERM_SESSION_ID`, `ITERM_PROFILE`, `LC_TERMINAL`, `LC_TERMINAL_VERSION`
+   - **Kitty**: `KITTY_WINDOW_ID`, `KITTY_LISTEN_ON`, `KITTY_PID`, `KITTY_PUBLIC_KEY`
+   - **Alacritty**: `ALACRITTY_LOG`, `ALACRITTY_WINDOW_ID`, `ALACRITTY_SOCKET`
+   - **Ghostty**: `GHOSTTY_RESOURCES_DIR`, `GHOSTTY_BIN_DIR`, `TERM_PROGRAM=ghostty`
+   - **WezTerm**: `WEZTERM_UNIX_SOCKET`, `WEZTERM_PANE`, `WEZTERM_EXECUTABLE`, `WEZTERM_CONFIG_FILE`
+   - **Warp**: `WARP_SESSION_ID`, `WARP_IS_LOCAL_SHELL_SESSION`
+   - **VS Code / Cursor / Windsurf**: `VSCODE_INJECTION`, `VSCODE_PID`, `VSCODE_NONCE`, `VSCODE_GIT_IPC_HANDLE`
+   - **tmux & GNU Screen**: `TMUX`, `TMUX_PANE`, `STY`, `WINDOW`
+   - **Linux VTE & Konsole**: `KONSOLE_VERSION`, `VTE_VERSION`, `TILIX_ID`, `TERMINATOR_UUID`, `ZELLIJ`, `FOOT_SERVER_SOCKET`, `WINDOWID`
+
+2. **Universal Headless Enforcement Flags**: Explicitly injects `TERM=dumb`, `CI=1`, `NO_COLOR=1`, `DEBIAN_FRONTEND=noninteractive`, `PYTHONUNBUFFERED=1`, `MPLBACKEND=Agg`, `QT_QPA_PLATFORM=offscreen`, and `ELECTRON_RUN_AS_NODE=1`.
+3. **Controlling TTY Detachment**: Spawns workers in independent sessions (`setsid` / `process_group(0)`) with `stderr` routed to `/dev/null`, preventing any escape sequences, status reports, or dock bounces from reaching the user's desktop.
+
+---
+
+## Live Terminal Telemetry & Protocol Compliance
+
+Airlock strictly implements the agent PreToolUse hook protocol while maintaining rich human-visible terminal status:
+
+- **Interactive Human Banner**: Writes a single, high-visibility line directly to `/dev/tty` or `stderr` without duplicate output:
+  - `✔ allowed by Danny's custom classifier (3.4ms)` *(Terminal color: Green)*
+  - `✖ denied by Danny's custom classifier (0.9ms): Tier 0 Hard Deny: Direct access to protected credentials` *(Terminal color: Red)*
+- **Strict Single-Line JSON on stdout**: Guarantees exactly one JSON object on `stdout` (`{"decision":"allow"|"deny","reason":"..."}`), preventing JSON unmarshaling errors in agent hook runners.
 
 ---
 
