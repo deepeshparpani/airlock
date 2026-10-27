@@ -18,9 +18,9 @@ git add .
 # 3. Create initial release commit
 git commit -m "feat: complete modular architecture for Airlock security classifier"
 
-# 4. Point to your new remote repository (replace with your repo URL)
-git remote set-url origin git@github.com:<YOUR-USERNAME>/airlock.git
-# (or git remote add origin git@github.com:<YOUR-USERNAME>/airlock.git)
+# 4. Point to your remote repository
+git remote set-url origin git@github.com:deepeshparpani/airlock.git
+# (or git remote add origin git@github.com:deepeshparpani/airlock.git)
 
 # 5. Push to main branch
 git branch -M main
@@ -59,7 +59,7 @@ The codebase has been refactored into a modern, decoupled Python package (`airlo
 Anyone using Antigravity (`agy`) can install it globally with a single command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/<YOUR-USERNAME>/airlock/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/deepeshparpani/airlock/main/install.sh | bash
 ```
 
 The installer:
@@ -85,7 +85,7 @@ This registers the CLI binaries:
 Every repository release should be verified using the test suite and benchmark:
 
 ```bash
-# Run all 58 security tests (covers destructive commands, injection, protected paths, tunneling, evasion, and cluster remotes)
+# Run all 63 security tests (covers destructive commands, injection, protected paths, tunneling, evasion, and cluster remotes)
 python3 test.py
 
 # Evaluate a specific command

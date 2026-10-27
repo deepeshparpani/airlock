@@ -26,3 +26,9 @@ Thumbs.db
 
 # Rust Build Artifacts
 target/
+
+# Daemon Sockets, Manifests & Temporary Files
+*.sock
+*.port
+*.lock
+*.tmp

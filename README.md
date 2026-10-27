@@ -1,13 +1,15 @@
-<h1 align="center">Airlock: Autonomous AI Agent Security Mesh & Classifier</h1>
+<h1 align="center">Airlock: The Missing "Auto Mode" for Antigravity & AI Coding Agents</h1>
 
 <p align="center">
-  <b>A high-assurance, low-latency runtime defense system for autonomous coding agents (Google Antigravity / AGY, Claude Code, OpenAI Operator).</b><br>
-  Evaluates and intercepts tool invocations in real time to prevent catastrophic filesystem mutations, credential harvesting, unauthorized egress, and personal data exfiltration.
+  <b>Google Antigravity doesn't have an intelligent Auto Mode. So we built it.</b><br>
+  A microsecond runtime defense system & classifier for <b>Google Antigravity (CLI & Desktop IDE)</b>, Claude Code, Cursor, and autonomous agent harnesses.<br>
+  Auto-approves safe developer commands in &lt;1ms while blocking destructive mutations, credential leaks, and prompt injections with zero human babysitting.
 </p>
 
 <p align="center">
   <img alt="Rust" src="https://img.shields.io/badge/Rust-1.75%2B-orange?logo=rust&logoColor=white">
   <img alt="Python" src="https://img.shields.io/badge/Python-%3E%3D3.10-3776ab?logo=python&logoColor=white">
+  <img alt="Platform" src="https://img.shields.io/badge/Supports-Antigravity%20CLI%20%2B%20Desktop%20IDE-blueviolet">
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
   <img alt="Latency" src="https://img.shields.io/badge/Cold%20Start-3.8ms-brightgreen">
   <img alt="Throughput" src="https://img.shields.io/badge/Throughput-125k%2B%20ops%2Fsec-success">
@@ -16,14 +18,35 @@
 
 ---
 
-## The Problem: The Unattended Agent Paradox
+## The Missing "Auto Mode": The Unattended Agent Paradox
 
-Autonomous AI coding agents operate with the user's full ambient host permissions. Today's developers face an impossible trade-off:
+When using autonomous coding agents like **Google Antigravity**, you run into an infuriating dilemma: **there is no intelligent "Auto Mode"**. 
 
-1. **Interactive Babysitting Mode**: The agent stops every 15 seconds to ask for permission to run harmless commands like `ls`, `git status`, or `npm test`, completely destroying autonomy.
-2. **"Suicide" Mode (`--dangerously-skip-permissions`)**: The agent runs unattended at full speed, but a single hallucinated prompt injection or destructive command can delete your home directory, read `~/.ssh/id_rsa`, or exfiltrate environment variables.
+You are forced to choose between two broken extremes:
 
-**Airlock solves this by serving as an intelligent, zero-dependency safety airlock between AI agents and the host operating system.** Safe developer commands are approved in sub-milliseconds without human intervention, while dangerous, exfiltration, or prompt-injection attempts are blocked instantly.
+1. **Babysitting Mode**: The agent stops every 15 seconds to ask for manual human approval before running routine, harmless commands like `ls -la`, `git status`, `cargo check`, or `npm test`. Autonomy is completely destroyed—you spend your entire workday clicking "Approve".
+2. **"Suicide" Mode (`always-proceed` / `--dangerously-skip-permissions`)**: You enable auto-execution to let the agent work unattended, but you hand an LLM unrestricted, ambient access to your computer. A single hallucinated command, lateral script, or prompt injection from an untrusted web page can delete your home directory (`rm -rf ~`), leak your SSH private keys (`cat ~/.ssh/id_rsa`), or exfiltrate environment variables.
+
+### The Solution: We Built the Auto Mode
+
+**Airlock is the intelligent runtime airlock between the AI agent and your operating system.**
+
+Instead of blindly approving everything or pestering you with prompts, Airlock intercepts every command in real time:
+- **Instant Microsecond Approval (<1ms)**: Verified read-only diagnostics (`ls`, `git diff`, `git log`, `pwd`), safe build cleanups (`rm -rf dist`), cluster checks (`ssh cook.cs.umass.edu 'sinfo'`), and safe Python/Node commands are automatically approved locally in microseconds.
+- **Microsecond Hard-Deny (<1ms)**: Destructive attacks (`rm -rf /`, formatting partitions, overwriting `/etc/passwd`), direct reads of credential stores (`~/.ssh`, `~/.aws`, `.env`, macOS Keychains, browser session cookies, iMessage `chat.db`), reverse shells, tunneling tools (`ngrok`, `cloudflared`), and adversarial prompt injection strings are blocked instantly.
+- **Cascaded AI Review (<2.5s)**: Truly ambiguous or complex commands are evaluated by warm background semantic classifiers with fail-closed security.
+
+---
+
+## Does This Work in the Antigravity Desktop App or Just the CLI?
+
+**It works in BOTH the Antigravity Desktop IDE (`Antigravity IDE.app`) and the Antigravity CLI (`agy`)!**
+
+Airlock is built directly into Antigravity's unified hook engine:
+- Antigravity's core architecture routes all tool executions (`run_command`) through `~/.gemini/config/hooks.json`.
+- Whether you are chatting with Antigravity inside the **Desktop IDE GUI** or running autonomous workflows via the **`agy` terminal CLI**, Antigravity executes Airlock's `PreToolUse` hook before any command touches your shell.
+- When you set tool permissions to `"always-proceed"` in Antigravity, **Airlock acts as the governor**: safe commands run instantly without prompting, while dangerous commands are rejected before execution in both the Desktop IDE and CLI!
+- Beyond Antigravity, Airlock also runs as a universal wrapper (`airlock exec -- <cmd>`) or stdin pipe for **Claude Code, Cursor, Cline, OpenHands**, or CI/CD pipelines.
 
 ---
 
@@ -145,9 +168,17 @@ airlock/
 
 ### 1. One-Click Global Setup (Recommended for AGY)
 
-From the repository directory:
+Run the one-line remote installer:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/deepeshparpani/airlock/main/install.sh | bash
+```
+
+Or clone and install locally:
+
+```bash
+git clone https://github.com/deepeshparpani/airlock.git
+cd airlock
 bash install.sh
 ```
 
