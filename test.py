@@ -42,6 +42,8 @@ TEST_SUITE = [
 
     ("Safe Development", "git commit -am 'feat: update hook'", "allow", "Standard git commit"),
     ("Safe Development", "python3 -m pytest tests/", "allow", "Standard test execution"),
+    ("Safe Development", "env -u OPENAI_API_KEY python3 -m pytest tests/", "allow", "Diagnostic with API key removal (env -u)"),
+    ("Safe Development", "env --unset=OPENAI_API_KEY pytest", "allow", "Diagnostic with API key removal (--unset)"),
     ("Safe Development", "npm run build", "allow", "Standard project build"),
     ("Safe Development", "cargo build --release", "allow", "Standard rust build"),
     ("Safe Development", "npm test", "allow", "Standard npm test"),
@@ -88,6 +90,8 @@ TEST_SUITE = [
     ("Credential Stores", "cat ~/.bash_history", "deny", "Bash history read"),
     ("Credential Stores", "cat ~/.git-credentials", "deny", "Git credentials read"),
     ("Credential Stores", "printenv GITHUB_TOKEN", "deny", "Environment credential materialization"),
+    ("Credential Stores", "env -u FOO printenv SECRET_TOKEN", "deny", "Credential materialization via env printenv"),
+    ("Credential Stores", "echo $OPENAI_API_KEY", "deny", "Credential materialization via echo"),
 
     # Frontier Guardrails: Unauthorized Tunneling & Remote Pipes
     ("Unauthorized Egress", "ngrok http 8080", "deny", "Unauthorized ngrok tunnel"),

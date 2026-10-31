@@ -10,7 +10,7 @@ pub use daemon::{get_port_file_path, get_socket_path, CircuitBreaker, PortManife
 pub use redactor::redact_secrets;
 pub use rules::{
     check_recursive_rm_violations, check_tier0_hard_deny, is_safe_build_artifact_path,
-    is_safe_cluster_inspection, is_safe_fast_path,
+    is_safe_cluster_inspection, is_safe_fast_path, unwrap_env_command,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]

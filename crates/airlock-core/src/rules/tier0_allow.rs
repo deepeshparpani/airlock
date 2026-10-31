@@ -127,6 +127,73 @@ pub fn parse_ssh_command(cmd: &str) -> (Option<String>, Option<String>) {
     (host, remote_cmd)
 }
 
+pub fn unwrap_env_command(cmd: &str) -> Option<String> {
+    let tokens: Vec<String> = shlex::split(cmd)?;
+    if tokens.is_empty() {
+        return None;
+    }
+
+    let base_cmd = Path::new(&tokens[0])
+        .file_name()
+        .and_then(|f| f.to_str())
+        .unwrap_or("");
+
+    if base_cmd != "env" {
+        return None;
+    }
+
+    let mut idx = 1;
+    let mut end_of_options = false;
+
+    while idx < tokens.len() {
+        let tok = &tokens[idx];
+
+        if !end_of_options && tok == "--" {
+            end_of_options = true;
+            idx += 1;
+            continue;
+        }
+
+        if !end_of_options {
+            if tok == "-u" || tok == "--unset" {
+                idx += 2;
+                continue;
+            }
+            if tok.starts_with("--unset=") || tok.starts_with("-u=") || (tok.starts_with("-u") && tok.len() > 2) {
+                idx += 1;
+                continue;
+            }
+            if tok == "-i" || tok == "--ignore-environment" || tok == "-0" || tok == "--null" || tok == "-v" || tok == "--debug" {
+                idx += 1;
+                continue;
+            }
+            if tok == "-C" || tok == "--chdir" {
+                idx += 2;
+                continue;
+            }
+            if tok.starts_with("--chdir=") || tok.starts_with("-C=") {
+                idx += 1;
+                continue;
+            }
+            if tok.starts_with('-') {
+                idx += 1;
+                continue;
+            }
+        }
+
+        // Environment variable assignment (e.g. FOO=bar)
+        if tok.contains('=') && !tok.starts_with('/') && !tok.starts_with('.') {
+            idx += 1;
+            continue;
+        }
+
+        // First non-option, non-assignment token is the command to run
+        return Some(tokens[idx..].join(" "));
+    }
+
+    None
+}
+
 pub fn is_safe_cluster_inspection(cmd: &str) -> bool {
     let trimmed = cmd.trim();
     if trimmed.is_empty() {
@@ -190,6 +257,13 @@ pub fn is_safe_fast_path(command_line: &str) -> bool {
                     return true;
                 }
             }
+        }
+    }
+
+    // Safe env unwrapping (e.g. env -u OPENAI_API_KEY pytest)
+    if let Some(unwrapped) = unwrap_env_command(cmd) {
+        if is_safe_fast_path(&unwrapped) {
+            return true;
         }
     }
 
@@ -422,5 +496,14 @@ mod tests {
         assert!(!is_safe_fast_path("python3 -c \"import os; os.system('rm -rf /')\""));
         assert!(!is_safe_fast_path("python3 -c \"open('.env').read()\""));
         assert!(!is_safe_fast_path("python3 -c \"import subprocess; subprocess.run(['id'])\""));
+    }
+
+    #[test]
+    fn test_safe_env_unwrapping() {
+        assert!(is_safe_fast_path("env -u OPENAI_API_KEY pytest"));
+        assert!(is_safe_fast_path("env -u OPENAI_API_KEY -u GITHUB_TOKEN python3 -m pytest tests/"));
+        assert!(is_safe_fast_path("env --unset=OPENAI_API_KEY git status"));
+        assert!(!is_safe_fast_path("env -u OPENAI_API_KEY cat ~/.ssh/id_rsa"));
+        assert!(!is_safe_fast_path("env -u OPENAI_API_KEY rm -rf /"));
     }
 }

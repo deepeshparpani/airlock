@@ -89,6 +89,60 @@ def parse_ssh_command(cmd: str) -> tuple[str | None, str | None]:
 
     return host, " ".join(remote_tokens).strip()
 
+def unwrap_env_command(cmd: str) -> str | None:
+    """Unwraps an 'env' wrapper to extract the underlying command and args."""
+    try:
+        tokens = shlex.split(cmd)
+    except Exception:
+        tokens = cmd.split()
+    if not tokens:
+        return None
+
+    base_cmd = os.path.basename(tokens[0])
+    if base_cmd != "env":
+        return None
+
+    idx = 1
+    end_of_options = False
+
+    while idx < len(tokens):
+        tok = tokens[idx]
+
+        if not end_of_options and tok == "--":
+            end_of_options = True
+            idx += 1
+            continue
+
+        if not end_of_options:
+            if tok in ("-u", "--unset"):
+                idx += 2
+                continue
+            if tok.startswith("--unset=") or tok.startswith("-u=") or (tok.startswith("-u") and len(tok) > 2):
+                idx += 1
+                continue
+            if tok in ("-i", "--ignore-environment", "-0", "--null", "-v", "--debug"):
+                idx += 1
+                continue
+            if tok in ("-C", "--chdir"):
+                idx += 2
+                continue
+            if tok.startswith("--chdir=") or tok.startswith("-C="):
+                idx += 1
+                continue
+            if tok.startswith("-"):
+                idx += 1
+                continue
+
+        # Environment variable assignment (e.g. FOO=bar)
+        if "=" in tok and not tok.startswith("/") and not tok.startswith("."):
+            idx += 1
+            continue
+
+        # First non-option, non-assignment token is the command to run
+        return " ".join(tokens[idx:])
+
+    return None
+
 def is_safe_cluster_inspection(cmd: str) -> bool:
     """Checks if command is a safe node availability or cluster inspection command."""
     trimmed = cmd.strip()
@@ -191,6 +245,11 @@ def is_safe_fast_path(command_line: str) -> bool:
             if not any(c in cd_target for c in ('`', '$', ';', '|')):
                 if is_safe_fast_path(parts[1]):
                     return True
+
+    # Safe env unwrapping (e.g. env -u OPENAI_API_KEY pytest)
+    unwrapped = unwrap_env_command(cmd)
+    if unwrapped and is_safe_fast_path(unwrapped):
+        return True
 
     if has_shell_control_or_substitution(cmd):
         return False

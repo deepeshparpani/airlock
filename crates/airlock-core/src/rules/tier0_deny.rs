@@ -230,6 +230,9 @@ static CRED_ECHO_RE: LazyLock<Regex> = LazyLock::new(|| {
 static CRED_PRINTENV_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\b(?:printenv|env)\s+.*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|PRIVATE)").unwrap()
 });
+static ENV_UNSET_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"(?:\s|^)(?:-u\s*=?\s*|--unset\s*=?\s*)["']?[A-Za-z0-9_]+["']?"#).unwrap()
+});
 static NETWORK_TOOLS_RE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\b(?:curl|wget|nc|ncat|netcat|socat|scp|rsync|sftp)\b").unwrap()
 });
@@ -335,7 +338,12 @@ pub fn check_tier0_hard_deny(cmd: &str) -> Option<String> {
         return Some("Tier 0 Hard Deny: Browser session debugging / remote profile takeover attempt detected".to_string());
     }
 
-    if CRED_ECHO_RE.is_match(trimmed) || CRED_PRINTENV_RE.is_match(trimmed) {
+    if CRED_ECHO_RE.is_match(trimmed) {
+        return Some("Tier 0 Hard Deny: Credential materialization from environment variable detected".to_string());
+    }
+
+    let env_check_target = ENV_UNSET_RE.replace_all(trimmed, " ");
+    if CRED_PRINTENV_RE.is_match(&env_check_target) {
         return Some("Tier 0 Hard Deny: Credential materialization from environment variable detected".to_string());
     }
 
@@ -403,5 +411,19 @@ mod tests {
         assert!(check_tier0_hard_deny(cmd1).is_none());
         assert!(check_tier0_hard_deny(cmd2).is_none());
         assert!(check_tier0_hard_deny(cmd3).is_none());
+    }
+
+    #[test]
+    fn test_credential_materialization_and_env_unset() {
+        // True credential materialization must be denied
+        assert!(check_tier0_hard_deny("printenv GITHUB_TOKEN").is_some());
+        assert!(check_tier0_hard_deny("echo $OPENAI_API_KEY").is_some());
+        assert!(check_tier0_hard_deny("env | grep API_KEY").is_some());
+        assert!(check_tier0_hard_deny("env -u FOO printenv SECRET_TOKEN").is_some());
+
+        // Environment scrubbing / removal via env -u or --unset is safe diagnostic isolation
+        assert!(check_tier0_hard_deny("env -u OPENAI_API_KEY python3 -m pytest tests/").is_none());
+        assert!(check_tier0_hard_deny("env --unset=OPENAI_API_KEY pytest").is_none());
+        assert!(check_tier0_hard_deny("env -u \"OPENAI_API_KEY\" -u \"ANTHROPIC_API_KEY\" python3 test.py").is_none());
     }
 }

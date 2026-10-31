@@ -141,8 +141,12 @@ def check_tier0_hard_deny(cmd: str) -> str | None:
         return "Tier 0 Hard Deny: Browser session debugging / remote profile takeover attempt detected"
 
     # 5. Credential Materialization from Environment Variables
-    if re.search(r'\b(?:echo|printf)\s+.*\$[A-Za-z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|PRIVATE)', trimmed) or \
-       re.search(r'\b(?:printenv|env)\s+.*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|PRIVATE)', trimmed):
+    if re.search(r'\b(?:echo|printf)\s+.*\$[A-Za-z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|PRIVATE)', trimmed):
+        return "Tier 0 Hard Deny: Credential materialization from environment variable detected"
+
+    # For env/printenv, strip safe -u/--unset flags (e.g. env -u OPENAI_API_KEY) before checking for credential materialization
+    env_check_target = re.sub(r'(?:\s|^)(?:-u\s*=?\s*|--unset\s*=?\s*)["\']?[A-Za-z0-9_]+["\']?', ' ', trimmed)
+    if re.search(r'\b(?:printenv|env)\s+.*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL|PRIVATE)', env_check_target):
         return "Tier 0 Hard Deny: Credential materialization from environment variable detected"
 
     # 6. Sensitive personal data, browser artifacts, keychains, and credential paths
