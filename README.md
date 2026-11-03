@@ -27,6 +27,14 @@ You are forced to choose between two broken extremes:
 1. **Babysitting Mode**: The agent stops every 15 seconds to ask for manual human approval before running routine, harmless commands like `ls -la`, `git status`, `cargo check`, or `npm test`. Autonomy is completely destroyed—you spend your entire workday clicking "Approve".
 2. **"Suicide" Mode (`always-proceed` / `--dangerously-skip-permissions`)**: You enable auto-execution to let the agent work unattended, but you hand an LLM unrestricted, ambient access to your computer. A single hallucinated command, lateral script, or prompt injection from an untrusted web page can delete your home directory (`rm -rf ~`), leak your SSH private keys (`cat ~/.ssh/id_rsa`), or exfiltrate environment variables.
 
+### The "Send Right Now" (`Alt+M` / `Option+M`) Flaw
+
+Antigravity attempts to bridge this gap with a mid-turn steering shortcut: pressing **`Alt+M`** (or **`Option+M`** on macOS) to *"Send right now"* instead of queuing messages until the entire turn concludes. In practice, developers quickly discover why this is a broken safety net:
+
+1. **No In-Flight Cancellation**: *"Send right now"* is purely step-boundary steering (`NEXT_INVOCATION`). It does **not** interrupt or abort an active in-flight tool execution (`run_command`). If the agent is executing a dangerous command or an unverified lateral script, that process still runs to completion while your message waits for the next LLM invocation.
+2. **The macOS `Option+M` Keyboard Trap (`µ`)**: On macOS, standard terminal emulators (Apple Terminal, iTerm2, Warp, Ghostty, Kitty, Alacritty) map `Option+M` to the Greek character `µ` by default rather than sending an `Alt` escape sequence. Unless developers manually dig into terminal preferences to enable "Option as Meta (`+Esc`)", the hotkey either does nothing or garbles the prompt.
+3. **The "Frantic Babysitter" Anti-Pattern**: If you have to keep your fingers hovering over `Alt+M` to catch a runaway command before it mutates your disk, you don't have autonomous AI—you have high-stress babysitting.
+
 ### The Solution: We Built the Auto Mode
 
 **Airlock is the intelligent runtime airlock between the AI agent and your operating system.**
