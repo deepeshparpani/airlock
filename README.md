@@ -74,10 +74,11 @@ Airlock combines principles from across systems programming, computer architectu
     - **Tier 0 Deterministic Engine (<1ms)**: Immediate microsecond decision for known safe diagnostics, safe build cleanups, and known malicious/injection vectors.
     - **Stage 1 Fast SLM (~2.5s)**: Low-latency schema-enforced classifier (`gemini-3.8-flash-low`) scoring intent confidence (`high` vs `low`).
     - **Stage 2 Deep Review Escalation (<10s)**: High-risk or ambiguous commands fail closed into deep multi-model deliberative evaluation (`claude-3-5-haiku`, `gemini-2.5-flash`).
-  - **High-Assurance Calibration**: 63-vector security test suite verifying zero false negatives across critical threat models.
+  - **High-Assurance Calibration**: 67-vector security test suite verifying zero false negatives across critical threat models.
 
 - **AI Context Control & Data Loss Prevention (DLP)**:
   - **Bidirectional Secret Scrubbing**: High-entropy tokens, private keys, API credentials, and AWS tokens are automatically redacted *before* any payload leaves the machine for LLM inspection.
+  - **Safe Environment Isolation**: Intelligently differentiates credential materialization leaks (`printenv KEY`, `echo $KEY`, `env | grep KEY`) from benign diagnostic environment scrubbing (`env -u KEY <cmd>`, `env --unset=KEY <cmd>`), eliminating false positives during test isolation.
 
 ---
 
@@ -156,7 +157,7 @@ airlock/
 │   └── airlock_daemon.py        # Python daemon entrypoint
 ├── pyproject.toml               # Modern PEP 621 Python package configuration
 ├── install.sh                   # 1-Click setup script (auto-compiles Rust if available)
-├── test.py                      # Comprehensive 58-point security test suite
+├── test.py                      # Comprehensive 67-point security test suite
 ├── benchmark.py                 # Multi-tier latency benchmarking utility
 ├── LICENSE                      # MIT License
 └── README.md
@@ -255,7 +256,7 @@ cargo run --release --example stress_test
 
 ## Verification & Benchmarks
 
-### Security Verification Suite (63 Tests)
+### Security Verification Suite (67 Tests)
 
 Verify that the security hook correctly blocks destructive actions, command injections, credential harvesting, and personal data exfiltration, while safely permitting normal development:
 
@@ -265,7 +266,7 @@ python3 test.py
 
 ```text
 ------------------------------------------------------------------------------------------------------------------------
-Total: 63 | Passed: 63 | Failed: 0 | Time: 0.59s
+Total: 67 | Passed: 67 | Failed: 0 | Time: 0.74s
 All security checks passed!
 ```
 
