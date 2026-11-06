@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgChart" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="rustBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="pyBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="360" rx="14" fill="url(#bgChart)" stroke="#1e293b" stroke-width="1.5"/>
+
+  <text x="40" y="44" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#f8fafc">
+    Real-World Invocation Latency Benchmark (macOS arm64)
+  </text>
+  <text x="40" y="66" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#94a3b8">
+    Process lifetime cold-start overhead per AI agent PreToolUse execution
+  </text>
+
+  <!-- Metric 1: Python Hook -->
+  <g transform="translate(40, 100)">
+    <text x="0" y="16" font-family="sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">Python Engine (`airlock_hook.py`)</text>
+    <rect x="0" y="26" width="600" height="34" rx="6" fill="#1e293b"/>
+    <rect x="0" y="26" width="580" height="34" rx="6" fill="url(#pyBar)"/>
+    <text x="590" y="48" font-family="monospace" font-size="13" font-weight="700" fill="#f1f5f9">~41.2 ms</text>
+    <text x="12" y="48" font-family="sans-serif" font-size="11" font-weight="600" fill="#0f172a">Baseline Python Interpreter Cold Start</text>
+  </g>
+
+  <!-- Metric 2: Rust Native Hook -->
+  <g transform="translate(40, 190)">
+    <text x="0" y="16" font-family="sans-serif" font-size="13" font-weight="600" fill="#34d399">Rust Native Engine (`airlock-hook` / `airlock`)</text>
+    <rect x="0" y="26" width="600" height="34" rx="6" fill="#1e293b"/>
+    <rect x="0" y="26" width="55" height="34" rx="6" fill="url(#rustBar)"/>
+    <text x="68" y="48" font-family="monospace" font-size="14" font-weight="800" fill="#34d399">~3.8 ms (10.8x FASTER)</text>
+    <text x="320" y="48" font-family="monospace" font-size="11" fill="#10b981">Zero GC • ~2MB RSS Footprint</text>
+  </g>
+
+  <!-- Metric 3: Tier 0 Core Rule Evaluation -->
+  <g transform="translate(40, 280)">
+    <text x="0" y="14" font-family="sans-serif" font-size="12" font-weight="600" fill="#38bdf8">Internal Tier 0 Rule Evaluation (Microseconds)</text>
+    <rect x="0" y="22" width="600" height="24" rx="4" fill="#1e293b"/>
+    <rect x="0" y="22" width="12" height="24" rx="4" fill="#38bdf8"/>
+    <text x="24" y="38" font-family="monospace" font-size="12" font-weight="700" fill="#38bdf8">&lt; 0.01 ms (&lt; 10 µs)</text>
+    <text x="200" y="38" font-family="sans-serif" font-size="11" fill="#94a3b8">Instant zero-allocation compiled regex &amp; AST path matching</text>
+  </g>
+</svg>

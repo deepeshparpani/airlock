@@ -13,7 +13,8 @@
   <img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg">
   <img alt="Latency" src="https://img.shields.io/badge/Cold%20Start-3.8ms-brightgreen">
   <img alt="Throughput" src="https://img.shields.io/badge/Throughput-125k%2B%20ops%2Fsec-success">
-  <img alt="Tests" src="https://img.shields.io/badge/Tests-63%2F63%20Passing-brightgreen">
+  <img alt="Tests" src="https://img.shields.io/badge/Tests-67%2F67%20Passing-brightgreen">
+  <a href="https://deepeshparpani.github.io/airlock/"><img alt="Website" src="https://img.shields.io/badge/Live_Site-GitHub_Pages-blue?logo=github&logoColor=white"></a>
 </p>
 
 ---
