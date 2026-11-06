@@ -8,7 +8,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -16,17 +16,17 @@
   <!-- Navigation -->
   <nav class="navbar">
     <a href="#" class="nav-brand">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
       Airlock
     </a>
 
     <ul class="nav-links">
-      <li><a href="#paradox">The Paradox</a></li>
+      <li><a href="#dilemma">The Problem</a></li>
       <li><a href="#architecture">Architecture</a></li>
       <li><a href="#decisions">Standards &amp; ADRs</a></li>
-      <li><a href="#compliance">AI Safety Standards</a></li>
+      <li><a href="#compliance">Safety Standards</a></li>
       <li><a href="#benchmarks">Benchmarks</a></li>
       <li><a href="#simulator">Simulator</a></li>
       <li><a href="#quickstart">Quickstart</a></li>
@@ -34,12 +34,12 @@
 
     <div class="nav-actions">
       <a href="https://github.com/deepeshparpani/airlock" target="_blank" rel="noopener" class="btn btn-secondary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
         </svg>
         GitHub
       </a>
-      <a href="#quickstart" class="btn btn-primary">Install Airlock</a>
+      <a href="#quickstart" class="btn btn-primary">Install</a>
     </div>
   </nav>
 
@@ -47,51 +47,48 @@
   <header class="hero">
     <div class="badge-pill">
       <span class="badge-pulse"></span>
-      Autonomous Runtime Governance for AI Coding Agents
+      Sub-Millisecond Runtime Firewall for AI Coding Agents
     </div>
-    <h1>The Missing Security Mesh for Autonomous AI Developers</h1>
+    <h1>Safe Autonomous Agent Execution at Microsecond Speed</h1>
     <p class="lead">
-      A sub-millisecond runtime firewall for <strong>Google Antigravity (CLI &amp; Desktop IDE)</strong>, Claude Code, Cursor, and agent harnesses. Auto-approves safe commands in &lt;1ms while blocking destructive deletions, credential leaks, and prompt injections with zero human babysitting.
+      Auto-approves harmless development commands in <strong>&lt;1ms</strong> while deterministically blocking destructive deletions, credential theft, and prompt injections across Google Antigravity, Claude Code, and Cursor.
     </p>
 
-    <!-- Key Metrics / Stats -->
+    <!-- Key Metrics -->
     <div class="hero-stats">
       <div class="stat-item">
         <div class="stat-val green">&lt; 10 µs</div>
-        <div class="stat-lbl">Tier 0 Invariant Check</div>
+        <div class="stat-lbl">Rule Evaluation</div>
       </div>
       <div class="stat-item">
         <div class="stat-val">3.8 ms</div>
-        <div class="stat-lbl">Rust Hook Cold Start</div>
+        <div class="stat-lbl">Hook Cold Start</div>
       </div>
       <div class="stat-item">
         <div class="stat-val green">67 / 67</div>
-        <div class="stat-lbl">Safety Suite Passing</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val">125k+</div>
-        <div class="stat-lbl">Ops / Sec Throughput</div>
+        <div class="stat-lbl">Safety Tests Passed</div>
       </div>
       <div class="stat-item">
         <div class="stat-val">~2 MB</div>
-        <div class="stat-lbl">RSS Memory Footprint</div>
+        <div class="stat-lbl">Memory Footprint</div>
       </div>
     </div>
 
+    <!-- Quick Install Command -->
     <div class="hero-cta">
       <div class="install-command-box">
         <code>curl -fsSL https://raw.githubusercontent.com/deepeshparpani/airlock/main/install.sh | bash</code>
-        <button class="copy-btn" title="Copy install command">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button class="copy-btn" title="Copy command">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
           </svg>
         </button>
       </div>
-      <a href="#simulator" class="btn btn-secondary">Try Live Simulator</a>
+      <a href="#simulator" class="btn btn-secondary">Test Simulator</a>
     </div>
 
-    <!-- Media Showcase / Terminal Demo GIF Container -->
+    <!-- Terminal Demo Mockup / GIF Placeholder -->
     <div class="media-container">
       <div class="media-header">
         <div class="media-dots">
@@ -99,238 +96,219 @@
           <span class="media-dot yellow"></span>
           <span class="media-dot green"></span>
         </div>
-        <div class="media-title">airlock-runtime-governance.session</div>
-        <div style="width: 40px;"></div>
+        <div class="media-title">airlock-terminal-demo.gif</div>
+        <div style="width: 30px;"></div>
       </div>
       <div class="media-body">
-        <!-- If demo.gif is placed in docs/assets/images/demo.gif, it displays automatically. Fallback to demo-placeholder.svg -->
         <img src="assets/images/demo.gif" onerror="this.onerror=null; this.src='assets/images/demo-placeholder.svg';" alt="Airlock Interactive Terminal Demo">
       </div>
       <div class="media-caption">
-        <strong>Figure 1.0:</strong> Sub-millisecond execution gating. Pure read commands are verified instantly (&lt;1ms), while destructive commands, prompt injections, and secret materializations are aborted before execution.
+        <strong>Figure 1:</strong> PreToolUse hook interception. Safe reads (<code>cargo test</code>, <code>env -u KEY pytest</code>) pass in &lt;1ms; destructive commands and prompt injections are aborted immediately.
       </div>
     </div>
   </header>
 
-  <!-- Section: The Unattended Agent Paradox -->
-  <section id="paradox" class="section">
+  <!-- Section 1: The Problem / Dilemma -->
+  <section id="dilemma" class="section">
     <div class="section-title-wrap">
-      <div class="section-tag">The Core Dilemma</div>
+      <div class="section-tag">The Dilemma</div>
       <h2 class="section-title">The Unattended Agent Paradox</h2>
-      <p class="section-desc">Why built-in platform "Auto Modes" fail to deliver true, secure autonomy for software engineering agents.</p>
+      <p class="section-desc">Why built-in platform "Auto Modes" fail to deliver true, secure unattended autonomy.</p>
     </div>
 
     <div class="cards-grid">
       <div class="card">
         <div class="card-icon yellow">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
           </svg>
         </div>
-        <h3>1. The "Babysitter" Trap</h3>
-        <p>Built-in platform "Auto Modes" sandbox routine commands, but the moment an action touches a native toolchain, installs a package, accesses the network, or appears "risky," <strong>it halts and waits for manual approval.</strong></p>
+        <h3>The Babysitter Trap</h3>
+        <p>Built-in platform "Auto Modes" sandbox routine tasks, but pause and prompt for confirmation on any unsandboxed or potentially "risky" command.</p>
         <ul>
-          <li>Breaks unattended execution when you leave your desk.</li>
-          <li>Causes extreme prompt fatigue (~50 clicks per hour).</li>
-          <li>Cannot run overnight or in autonomous CI/CD loops.</li>
+          <li>Breaks long-running or overnight tasks.</li>
+          <li>Constant confirmation prompts destroy developer flow.</li>
+          <li>Fails for native compilers, conda, and cluster SSH.</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-icon red">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/>
             <line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <h3>2. The "Suicide" Mode</h3>
-        <p>To bypass prompt fatigue, developers enable <code>--dangerously-skip-permissions</code> or <code>always-proceed</code>. This hands an LLM ambient root access to execute arbitrary code with zero guardrails.</p>
+        <h3>Unchecked "Turbo" Mode</h3>
+        <p>To bypass prompt fatigue, developers enable <code>always-proceed</code> or <code>--dangerously-skip-permissions</code>, granting an LLM raw root access.</p>
         <ul>
-          <li>Vulnerable to prompt injection from untrusted web pages.</li>
-          <li>Hallucinated lateral scripts can delete home directories (<code>rm -rf ~</code>).</li>
-          <li>Ambient extraction of SSH keys, AWS credentials, and keychains.</li>
+          <li>Vulnerable to indirect prompt injection from web pages.</li>
+          <li>Hallucinations can wipe home directories (<code>rm -rf ~</code>).</li>
+          <li>Silent extraction of SSH keys, browser cookies, and keychains.</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-icon green">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <h3>3. The Airlock Solution</h3>
-        <p>Airlock places a deterministic, sub-millisecond security mesh between the AI agent and the operating system process boundary. Developers can safely run with full unprompted autonomy.</p>
+        <h3>The Airlock Solution</h3>
+        <p>A deterministic, sub-millisecond process airlock between the AI agent and the operating system.</p>
         <ul>
-          <li><strong>Instant Microsecond Fast-Allow (&lt;1ms)</strong> for known safe reads.</li>
-          <li><strong>Zero-Tolerance Microsecond Hard-Deny</strong> for destructive/exfil actions.</li>
-          <li><strong>Cascaded AI Review (&lt;2.5s)</strong> for truly ambiguous mutations.</li>
+          <li><strong>Instant Fast-Allow (&lt;1ms)</strong> for verified read-only diagnostics.</li>
+          <li><strong>Zero-Tolerance Hard-Deny</strong> for destructive and exfiltration actions.</li>
+          <li><strong>Cascaded AI Review (&lt;2.5s)</strong> for ambiguous workspace mutations.</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- Section: Architecture Flow -->
+  <!-- Section 2: Architecture Pipeline -->
   <section id="architecture" class="section">
     <div class="section-title-wrap">
       <div class="section-tag">Systems Architecture</div>
-      <h2 class="section-title">Multi-Tier Cascaded Defense Pipeline</h2>
-      <p class="section-desc">Deterministic invariant evaluation at the microsecond layer, backed by semantic SLM verification and deep deliberative fail-closed escalation.</p>
+      <h2 class="section-title">Multi-Tier Cascaded Defense</h2>
+      <p class="section-desc">Deterministic microsecond invariant evaluation backed by semantic confidence classification.</p>
     </div>
 
     <!-- Architecture Visual -->
-    <div class="media-container" style="margin-bottom: 3.5rem;">
-      <div class="media-header">
-        <div class="media-dots">
-          <span class="media-dot red"></span>
-          <span class="media-dot yellow"></span>
-          <span class="media-dot green"></span>
-        </div>
-        <div class="media-title">airlock-pipeline-topology.svg</div>
-        <div style="width: 40px;"></div>
-      </div>
+    <div class="media-container" style="margin-bottom: 2.5rem;">
       <div class="media-body">
-        <img src="assets/images/architecture.svg" alt="Airlock Multi-Tier Architecture Diagram">
+        <img src="assets/images/architecture.svg" alt="Airlock Multi-Tier Pipeline Diagram">
       </div>
       <div class="media-caption">
-        <strong>Figure 2.0:</strong> Cascaded evaluation pipeline topology. Invariant security rules resolve 92%+ of commands in microseconds (&lt;1ms), while ambiguous commands cascade into semantic confidence classifiers.
+        <strong>Figure 2:</strong> 92%+ of commands resolve deterministically at Tier 0 in &lt;1ms. Complex mutations cascade to Stage 1.
       </div>
     </div>
 
     <div class="cards-grid">
       <div class="card">
         <div class="card-icon green">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
           </svg>
         </div>
-        <h3>Tier 0: Deterministic Guardrails (&lt;1ms)</h3>
-        <p>Implemented in pure Rust (<code>crates/airlock-core</code>) with zero external allocations. Executes in <strong>~10–40 microseconds</strong>:</p>
+        <h3>Tier 0: Deterministic Core (&lt;1ms)</h3>
+        <p>Compiled Rust engine (<code>crates/airlock-core</code>) executing in <strong>&lt;10 µs</strong>:</p>
         <ul>
-          <li><strong>Microsecond Prompt Injection Scanner</strong>: Rejects directive overrides (<code>ignore instructions</code>), roleplays, and model control tokens.</li>
-          <li><strong>Hard Path Deny</strong>: Blocks reads of <code>~/.ssh</code>, <code>~/.aws</code>, <code>.env</code>, macOS Keychains, browser session cookies, and personal databases (<code>chat.db</code>).</li>
-          <li><strong>Build Scope Restriction</strong>: Restricts <code>rm -rf</code> strictly to verified build artifacts (<code>dist/</code>, <code>target/</code>, <code>node_modules/</code>).</li>
+          <li><strong>Prompt Injection Scanner</strong>: Rejects directive overrides and model control tokens (<code>&lt;|im_start|&gt;</code>).</li>
+          <li><strong>Path Air-Gap</strong>: Hard blocks reads to <code>~/.ssh</code>, <code>~/.aws</code>, <code>.env</code>, macOS Keychains, and <code>chat.db</code>.</li>
+          <li><strong>Build Scope Restriction</strong>: Restricts <code>rm -rf</code> strictly to verified build outputs (<code>dist/</code>, <code>target/</code>).</li>
+          <li><strong>Environment Sanitization</strong>: Fast-paths <code>env -u KEY</code> while blocking <code>printenv KEY</code>.</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-icon yellow">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
             <line x1="8" y1="21" x2="16" y2="21"/>
             <line x1="12" y1="17" x2="12" y2="21"/>
           </svg>
         </div>
-        <h3>Stage 1: Fast SLM Filter (~2.5s)</h3>
-        <p>Unresolved or complex command mutations cascade over Unix domain sockets to a warm background daemon:</p>
+        <h3>Stage 1: Semantic SLM (~2.5s)</h3>
+        <p>Ambiguous mutations cascade over Unix domain sockets to a warm background daemon:</p>
         <ul>
-          <li><strong>Schema-Enforced Classification</strong>: Low-latency evaluation utilizing Gemini 3.8 Flash-Low.</li>
-          <li><strong>Confidence Scoring</strong>: Emits structured verdicts with <code>confidence: high | low</code>.</li>
-          <li><strong>Instant Short-Circuit</strong>: High-confidence allows bypass further review; low-confidence automatically escalates.</li>
+          <li>Schema-enforced Gemini 3.8 Flash-Low classification.</li>
+          <li>Evaluates intent confidence (<code>high</code> vs <code>low</code>).</li>
+          <li>High confidence short-circuits; low confidence escalates.</li>
         </ul>
       </div>
 
       <div class="card">
-        <div class="card-icon purple">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="card-icon blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
             <line x1="16" y1="13" x2="8" y2="13"/>
             <line x1="16" y1="17" x2="8" y2="17"/>
           </svg>
         </div>
-        <h3>Stage 2: Deep Deliberation (&lt;10s)</h3>
-        <p>High-risk or ambiguous actions fail closed into deep multi-model deliberative review:</p>
+        <h3>Stage 2: Deep Review (&lt;10s)</h3>
+        <p>Deliberative review for lateral scripts and unknown endpoints:</p>
         <ul>
-          <li><strong>Lateral Threat Analysis</strong>: Evaluates obfuscated network interactions and multi-stage build scripts.</li>
-          <li><strong>Fail-Closed Guarantee</strong>: If models disagree or timeouts occur, the command is denied by default.</li>
-          <li><strong>Pre-Flight Secret Scrubbing</strong>: High-entropy tokens are redacted before leaving the host.</li>
+          <li>Multi-model analysis for complex multi-stage mutations.</li>
+          <li><strong>Fail-closed invariant</strong>: Denies by default on disagreement or timeout.</li>
+          <li>Pre-flight token scrubbing redacts secrets before model calls.</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- Section: Architectural Decisions & Standards Followed -->
+  <!-- Section 3: Standards Followed & ADRs -->
   <section id="decisions" class="section">
     <div class="section-title-wrap">
-      <div class="section-tag">Engineering Rigor</div>
+      <div class="section-tag">Engineering Standards</div>
       <h2 class="section-title">Architectural Decision Records (ADRs)</h2>
-      <p class="section-desc">Key architectural trade-offs, engineering standards, and systems invariants implemented in the Airlock codebase.</p>
+      <p class="section-desc">Key systems invariants, engineering trade-offs, and standards implemented in Airlock.</p>
     </div>
 
-    <!-- ADR 1 -->
     <div class="adr-card">
       <div class="adr-header">
-        <h4>ADR-001: Zero-Overhead Compiled Rust Core with POSIX Concurrency</h4>
+        <h4>ADR-001: Zero-Overhead Rust Core with POSIX Concurrency</h4>
         <span class="adr-badge">SYSTEMS &amp; OS</span>
       </div>
       <div class="adr-body">
-        <p><strong>Context &amp; Problem:</strong> AI agent hook orchestrators run synchronously on every tool call. A typical Python interpreter launch incurs a 40ms+ cold start, adding massive friction to rapid agent loops.</p>
-        <p><strong>Decision:</strong> We implemented the primary gatekeeper in compiled, native Rust (<code>crates/airlock-core</code> and <code>crates/airlock-hook</code>). We enforced strict POSIX concurrency invariants:</p>
-        <ul>
-          <li><strong>Kernel Singleton Locking:</strong> Non-blocking file descriptor locking via <code>flock(LOCK_EX | LOCK_NB)</code> to prevent concurrent daemon races.</li>
-          <li><strong>Atomic Port Manifests:</strong> Process coordination using PID-tagged temporary files and atomic POSIX <code>rename(2)</code> replacement to guarantee zero partial-read states.</li>
-          <li><strong>Universal Headless Isolation:</strong> Evaluator background processes are isolated using <code>setsid()</code> / <code>process_group(0)</code>, dynamically stripping session tokens across 11 terminal emulators to eliminate GUI flashes.</li>
-        </ul>
+        <strong>Context:</strong> Python cold starts (~40ms) add friction to rapid agent loops. Background daemons risk concurrency races.<br>
+        <strong>Decision:</strong> Implemented primary hook in compiled Rust (~3.8ms total lifecycle). Enforced non-blocking kernel locking via <code>flock(LOCK_EX | LOCK_NB)</code>, atomic port manifests via PID-tagged temp files and POSIX <code>rename(2)</code>, and headless background process isolation via <code>setsid()</code>.
       </div>
     </div>
 
-    <!-- ADR 2 -->
     <div class="adr-card">
       <div class="adr-header">
-        <h4>ADR-002: Dual-Language Graceful Degradation (Rust Core + Python Fallback)</h4>
+        <h4>ADR-002: Dual-Language Engine (Rust Speed + Python Fallback)</h4>
         <span class="adr-badge">PORTABILITY</span>
       </div>
       <div class="adr-body">
-        <p><strong>Context &amp; Problem:</strong> Enterprise and remote development environments may not have a Rust toolchain or build environment pre-installed.</p>
-        <p><strong>Decision:</strong> We adopted a dual-engine architecture: the high-performance native Rust binary provides 10.8x faster execution (~3.8ms), while an identical, pure standard-library Python package (zero external <code>pip</code> dependencies) serves as a universal zero-setup fallback.</p>
+        <strong>Context:</strong> Remote machines and minimal environments may lack a Rust compiler.<br>
+        <strong>Decision:</strong> Ships a 10.8x faster native binary with an identical, pure standard-library Python fallback (zero pip dependencies) that runs out of the box on any Unix host.
       </div>
     </div>
 
-    <!-- ADR 3 -->
     <div class="adr-card">
       <div class="adr-header">
-        <h4>ADR-003: Cryptographic Nonced Spotlighting &amp; Delimiter Breakout Defense</h4>
+        <h4>ADR-003: Cryptographic Nonced Spotlighting &amp; Breakout Defense</h4>
         <span class="adr-badge">AI SECURITY</span>
       </div>
       <div class="adr-body">
-        <p><strong>Context &amp; Problem:</strong> Untrusted command strings can contain adversarial prompt injection payloads designed to override system instructions or fool semantic classifiers.</p>
-        <p><strong>Decision:</strong> When escalating commands to LLM stages, Airlock encloses the raw payload inside cryptographic, nonce-tagged XML tags (<code>&lt;untrusted_command_{nonce}&gt;</code>). Any occurrence of the matching closing delimiter in the payload is sanitized prior to templating, neutralizing delimiter escape attacks.</p>
+        <strong>Context:</strong> Raw commands can contain prompt injections trying to trick LLM classifiers.<br>
+        <strong>Decision:</strong> Wraps escalated commands inside cryptographic nonced XML tags (<code>&lt;untrusted_command_{nonce}&gt;</code>) with delimiter escaping, preventing model instruction overrides and jailbreaks.
       </div>
     </div>
 
-    <!-- ADR 4 -->
     <div class="adr-card">
       <div class="adr-header">
-        <h4>ADR-004: Diagnostic Environment Isolation vs. Credential Materialization</h4>
+        <h4>ADR-004: Diagnostic Environment Isolation vs. Credential Leaks</h4>
         <span class="adr-badge">DLP &amp; HYGIENE</span>
       </div>
       <div class="adr-body">
-        <p><strong>Context &amp; Problem:</strong> Naive security regexes flag commands like <code>env -u OPENAI_API_KEY pytest</code> as credential leaks because the variable name matches secret patterns, blocking legitimate test processes.</p>
-        <p><strong>Decision:</strong> In both Rust (<code>ENV_UNSET_RE</code>) and Python, Airlock sanitizes <code>-u &lt;VAR&gt;</code> and <code>--unset=&lt;VAR&gt;</code> flags before evaluating credential materialization invariants. Legitimate test isolation is granted instant fast-path approval, while actual exfiltration (<code>printenv KEY</code>, <code>echo $KEY</code>, <code>env | grep KEY</code>) remains strictly denied.</p>
+        <strong>Context:</strong> Naive secret regexes flag commands like <code>env -u OPENAI_API_KEY pytest</code> as credential leaks.<br>
+        <strong>Decision:</strong> Sanitizes <code>-u &lt;VAR&gt;</code> and <code>--unset=&lt;VAR&gt;</code> before checking credential invariants. Legitimate test isolation is fast-path approved (&lt;1ms), while actual leaks (<code>printenv KEY</code>, <code>echo $KEY</code>) remain 100% blocked.
       </div>
     </div>
 
-    <!-- ADR 5 -->
     <div class="adr-card">
       <div class="adr-header">
-        <h4>ADR-005: AST-Canonicalized Safe Build Target Allowlisting</h4>
+        <h4>ADR-005: AST-Canonicalized Build Target Allowlisting</h4>
         <span class="adr-badge">DESTRUCTIVE SAFETY</span>
       </div>
       <div class="adr-body">
-        <p><strong>Context &amp; Problem:</strong> Completely banning <code>rm -rf</code> prevents agents from cleaning build directories (<code>cargo clean</code>, <code>rm -rf dist</code>), while allowing it unconditionally opens the door to catastrophic data loss.</p>
-        <p><strong>Decision:</strong> Airlock performs POSIX-compliant AST parsing of shell arguments. Deletion via <code>rm -rf</code> is strictly authorized <em>only</em> if all target arguments match an explicit allowlist of ephemeral build artifacts (<code>dist</code>, <code>build</code>, <code>target</code>, <code>node_modules</code>, <code>__pycache__</code>). Any target containing source code (<code>src/</code>), home directories (<code>~</code>), or wildcards (<code>*</code>) is hard-denied in &lt;1ms.</p>
+        <strong>Context:</strong> Banning <code>rm -rf</code> breaks <code>cargo clean</code> and build cleanups, but unconstrained deletion risks catastrophic data loss.<br>
+        <strong>Decision:</strong> Enforces POSIX-compliant AST parsing. Deletions via <code>rm -rf</code> are authorized <em>only</em> if all targets match safe build artifacts (<code>dist</code>, <code>build</code>, <code>target</code>, <code>node_modules</code>). Targets with source files (<code>src/</code>), home directories (<code>~</code>), or wildcards (<code>*</code>) are hard-denied in &lt;1ms.
       </div>
     </div>
   </section>
 
-  <!-- Section: Latest AI Safety Standards Mapping -->
+  <!-- Section 4: Compliance with Safety Standards -->
   <section id="compliance" class="section">
     <div class="section-title-wrap">
-      <div class="section-tag">Safety Standards &amp; Frameworks</div>
+      <div class="section-tag">Compliance Matrix</div>
       <h2 class="section-title">Mapping to International AI Safety Standards</h2>
-      <p class="section-desc">Airlock is designed in direct compliance with recognized cybersecurity, agentic autonomy, and LLM safety standards.</p>
+      <p class="section-desc">Airlock maps directly to modern cybersecurity and agentic AI safety frameworks.</p>
     </div>
 
     <div class="table-responsive">
@@ -339,82 +317,73 @@
           <tr>
             <th>Safety Framework</th>
             <th>Threat / Control Requirement</th>
-            <th>Airlock Technical Implementation</th>
-            <th>Assurance Guarantee</th>
+            <th>Airlock Technical Defense</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>OWASP Top 10 for LLMs (2025/2026)</strong></td>
-            <td><strong>LLM01: Prompt Injection</strong><br>Direct &amp; indirect instruction overrides</td>
-            <td>Microsecond pre-LLM regex scanner; nonced XML spotlighting; model control token breakout filters (<code>&lt;|im_start|&gt;</code>).</td>
-            <td><span class="verdict-allow">100% Invariant Deny</span></td>
+            <td><strong>OWASP Top 10 for LLMs</strong></td>
+            <td><strong>LLM01: Prompt Injection</strong> (Overrides &amp; breakouts)</td>
+            <td>Microsecond regex scanner; nonced XML spotlighting; control token filters (<code>&lt;|im_start|&gt;</code>).</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
           <tr>
-            <td><strong>OWASP Top 10 for LLMs (2025/2026)</strong></td>
-            <td><strong>LLM02: Sensitive Information Disclosure</strong><br>Extraction of personal data &amp; credentials</td>
-            <td>Strict path invariants on <code>~/.ssh</code>, <code>.env</code>, macOS Keychains, browser cookies, and iMessage <code>chat.db</code>.</td>
-            <td><span class="verdict-allow">Host Process Air-Gap</span></td>
+            <td><strong>OWASP Top 10 for LLMs</strong></td>
+            <td><strong>LLM02: Sensitive Info Disclosure</strong> (Key &amp; session leaks)</td>
+            <td>Strict path invariants on <code>~/.ssh</code>, <code>.env</code>, macOS Keychains, cookies, and <code>chat.db</code>.</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
           <tr>
-            <td><strong>OWASP Top 10 for LLMs (2025/2026)</strong></td>
-            <td><strong>LLM06: Excessive Agency</strong><br>Unchecked autonomous tool execution</td>
-            <td>Intercepts <code>PreToolUse</code> events across CLI &amp; Desktop IDE before execution touches the shell.</td>
-            <td><span class="verdict-allow">Runtime Gating Mesh</span></td>
+            <td><strong>OWASP Top 10 for LLMs</strong></td>
+            <td><strong>LLM06: Excessive Agency</strong> (Unchecked tool actions)</td>
+            <td>Intercepts <code>PreToolUse</code> events across CLI &amp; Desktop IDE before actions touch the shell.</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
           <tr>
-            <td><strong>OWASP Top 10 for LLMs (2025/2026)</strong></td>
-            <td><strong>LLM08: Vector &amp; Script Execution</strong><br>Blind remote script piping (<code>curl | sh</code>)</td>
-            <td>Deterministic prohibition on unverified execution pipes, reverse shells (<code>ncat -e /bin/sh</code>), and tunneling (<code>ngrok</code>).</td>
-            <td><span class="verdict-allow">&lt; 1ms Hard Deny</span></td>
+            <td><strong>OWASP Top 10 for LLMs</strong></td>
+            <td><strong>LLM08: Vector &amp; Lateral Scripts</strong> (<code>curl | sh</code>, tunnels)</td>
+            <td>Deterministic prohibition on unverified execution pipes, reverse shells, and <code>ngrok</code> / <code>cloudflared</code>.</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
           <tr>
-            <td><strong>NIST AI RMF 1.0 (NIST SP 1270)</strong></td>
-            <td><strong>Govern 1.2 &amp; Manage 2.1</strong><br>Auditable, fail-closed safety boundaries</td>
-            <td>Detailed microsecond execution logs with auditable structured JSON verdicts; fail-closed circuit breakers.</td>
-            <td><span class="verdict-allow">Deterministic Audit Trail</span></td>
+            <td><strong>NIST AI RMF 1.0 (SP 1270)</strong></td>
+            <td><strong>Govern 1.2 &amp; Manage 2.1</strong> (Auditable boundaries)</td>
+            <td>Auditable structured JSON verdicts with microsecond latency logs; fail-closed circuit breakers.</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
           <tr>
             <td><strong>MITRE ATLAS</strong></td>
-            <td><strong>AML.T0051 &amp; AML.T0043</strong><br>LLM Jailbreak &amp; Data Exfiltration via Tools</td>
-            <td>Pre-flight token redaction for high-entropy secrets (AWS, GitHub PATs); regex screening for exfiltration endpoints.</td>
-            <td><span class="verdict-allow">Zero False Negatives</span></td>
+            <td><strong>AML.T0051 &amp; AML.T0043</strong> (Jailbreak &amp; Exfiltration)</td>
+            <td>Pre-flight secret redactor scrubs AWS/GitHub tokens; filters exfiltration network sinks.</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
           <tr>
             <td><strong>CWE / SANS Top 25</strong></td>
-            <td><strong>CWE-78 &amp; CWE-250</strong><br>OS Command Injection &amp; Execution with Excess Privilege</td>
-            <td>AST argument canonicalization, preventing GuardFall quote-stripping and subshell parameter injection.</td>
-            <td><span class="verdict-allow">POSIX Canonicalized</span></td>
+            <td><strong>CWE-78 &amp; CWE-250</strong> (Command Injection &amp; Excess Privilege)</td>
+            <td>AST canonicalization defeats GuardFall quote-stripping (<code>r''m -rf /</code>) and subshell evasion.</td>
+            <td><span class="verdict-allow">✔ Enforced</span></td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- Section: Benchmarks -->
+  <!-- Section 5: Benchmarks -->
   <section id="benchmarks" class="section">
     <div class="section-title-wrap">
-      <div class="section-tag">Empirical Verification</div>
-      <h2 class="section-title">Performance &amp; Latency Benchmarks</h2>
-      <p class="section-desc">Benchmarked over real-world agent tool invocations on macOS Apple Silicon (arm64).</p>
+      <div class="section-tag">Performance</div>
+      <h2 class="section-title">Empirical Latency Benchmarks</h2>
+      <p class="section-desc">Measured over agent hook invocations on macOS Apple Silicon (arm64).</p>
     </div>
 
-    <!-- Benchmark Chart Container -->
-    <div class="media-container" style="margin-bottom: 3.5rem;">
-      <div class="media-header">
-        <div class="media-dots">
-          <span class="media-dot red"></span>
-          <span class="media-dot yellow"></span>
-          <span class="media-dot green"></span>
-        </div>
-        <div class="media-title">airlock-latency-comparison.svg</div>
-        <div style="width: 40px;"></div>
-      </div>
+    <!-- Benchmark Chart Visual -->
+    <div class="media-container" style="margin-bottom: 2rem;">
       <div class="media-body">
-        <img src="assets/images/benchmark-chart.svg" alt="Airlock Latency Benchmark Comparison">
+        <img src="assets/images/benchmark-chart.svg" alt="Airlock Latency Benchmark Chart">
       </div>
       <div class="media-caption">
-        <strong>Figure 3.0:</strong> Invocation latency benchmark. The native Rust engine completes the entire hook process lifecycle in 3.8ms (10.8x faster than Python) while core Tier 0 rules execute in under 10 microseconds.
+        <strong>Figure 3:</strong> Native Rust binary achieves ~3.8ms total process lifecycle (10.8x faster than Python) while core Tier 0 rules execute in &lt;10 µs.
       </div>
     </div>
 
@@ -424,66 +393,60 @@
           <tr>
             <th>Pipeline Tier</th>
             <th>Implementation Engine</th>
-            <th>Typical Latency</th>
-            <th>Handled Workloads</th>
+            <th>Latency</th>
+            <th>Scope</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>Tier 0 Core Invariant Check</strong></td>
-            <td>Native Compiled Rust</td>
+            <td><strong>Tier 0 Invariant Rule Check</strong></td>
+            <td>Compiled Rust</td>
             <td><strong>&lt; 0.01 ms (10 µs)</strong></td>
-            <td>Pure AST path inspection, prompt injection regex</td>
+            <td>Pure AST path inspection &amp; prompt injection regex</td>
           </tr>
           <tr>
-            <td><strong>Tier 0 Full Process Lifecycle</strong></td>
+            <td><strong>Tier 0 Hook Cold Start</strong></td>
             <td>Rust Binary (<code>airlock-hook</code>)</td>
             <td><strong>~3.8 ms</strong></td>
-            <td>Total cold-start execution time from agent spawn to exit</td>
+            <td>Total lifecycle from agent tool invocation to exit</td>
           </tr>
           <tr>
             <td><strong>Tier 0 Cluster Fast-Path</strong></td>
             <td>Rust Native / Python Fallback</td>
             <td><strong>~3.2 ms</strong></td>
-            <td><code>ssh cook.cs.umass.edu 'sinfo'</code>, <code>squeue</code>, <code>pestat</code></td>
+            <td><code>ssh cook.cs.umass.edu 'sinfo'</code>, <code>squeue</code></td>
           </tr>
           <tr>
             <td><strong>Tier 0 Python Fallback</strong></td>
-            <td>Standard Python Interpreter</td>
+            <td>Python Standard Library</td>
             <td><strong>~41.2 ms</strong></td>
-            <td>Zero-setup environments without a Rust compiler</td>
+            <td>Zero-setup environments without Rust compiler</td>
           </tr>
           <tr>
-            <td><strong>Stage 1 Semantic Classifier</strong></td>
-            <td>Gemini 3.8 Flash-Low via Daemon</td>
+            <td><strong>Stage 1 Semantic Filter</strong></td>
+            <td>Gemini Flash-Low via Daemon</td>
             <td><strong>~2.4 s</strong></td>
-            <td>Ambiguous workspace modifications &amp; lateral scripts</td>
-          </tr>
-          <tr>
-            <td><strong>Stress Test Throughput</strong></td>
-            <td>Multi-Threaded Rust Core</td>
-            <td><strong>125,000+ ops/sec</strong></td>
-            <td>800,000 concurrent operation saturation test</td>
+            <td>Ambiguous workspace modifications</td>
           </tr>
         </tbody>
       </table>
     </div>
   </section>
 
-  <!-- Section: Live Simulator Widget -->
+  <!-- Section 6: Live Simulator Widget -->
   <section id="simulator" class="section">
     <div class="section-title-wrap">
-      <div class="section-tag">Interactive Evaluation</div>
-      <h2 class="section-title">Live Tier 0 Invariant Simulator</h2>
-      <p class="section-desc">Test real-world developer commands or choose from the preset vectors below to observe Airlock's sub-millisecond classification in real time.</p>
+      <div class="section-tag">Interactive Demo</div>
+      <h2 class="section-title">Live Tier 0 Rule Simulator</h2>
+      <p class="section-desc">Test shell commands or select a preset below to see Airlock's microsecond evaluation in action.</p>
     </div>
 
     <div class="simulator-box">
       <div class="sim-presets">
-        <span style="font-size: 0.775rem; color: var(--text-dim); margin-right: 0.5rem; font-weight: 600;">PRESETS:</span>
-        <button class="sim-preset-btn" data-cmd="ls -la">ls -la</button>
+        <span style="font-size: 0.75rem; color: #64748b; margin-right: 0.4rem; font-weight: 600;">PRESETS:</span>
         <button class="sim-preset-btn" data-cmd="cargo test">cargo test</button>
         <button class="sim-preset-btn" data-cmd="env -u OPENAI_API_KEY python3 -m pytest tests/">env -u API_KEY pytest</button>
+        <button class="sim-preset-btn" data-cmd="rm -rf dist">rm -rf dist</button>
         <button class="sim-preset-btn" data-cmd="rm -rf /">rm -rf /</button>
         <button class="sim-preset-btn" data-cmd="cat ~/.ssh/id_rsa">cat ~/.ssh/id_rsa</button>
         <button class="sim-preset-btn" data-cmd="ngrok http 8080">ngrok http 8080</button>
@@ -492,47 +455,47 @@
 
       <div class="sim-input-row">
         <span class="sim-prompt-icon">$ airlock check</span>
-        <input type="text" id="sim-input" class="sim-input" value="env -u OPENAI_API_KEY python3 -m pytest tests/" placeholder="Type a shell command to evaluate...">
+        <input type="text" id="sim-input" class="sim-input" value="env -u OPENAI_API_KEY python3 -m pytest tests/" placeholder="Type a shell command...">
       </div>
 
       <div id="sim-output" class="sim-output">
-        <!-- Output dynamically populated by main.js -->
+        <!-- Dynamically populated by main.js -->
       </div>
     </div>
   </section>
 
-  <!-- Section: Quickstart & Installation -->
+  <!-- Section 7: Quickstart -->
   <section id="quickstart" class="section">
     <div class="section-title-wrap">
-      <div class="section-tag">Get Started</div>
-      <h2 class="section-title">1-Click Global Installation</h2>
-      <p class="section-desc">Installs the native Rust binary (~3.8ms) or Python fallback, configures Antigravity hooks, and equips the universal CLI.</p>
+      <div class="section-tag">Quickstart</div>
+      <h2 class="section-title">Installation &amp; Usage</h2>
+      <p class="section-desc">Installs the native Rust binary (~3.8ms) or Python fallback and configures hooks automatically.</p>
     </div>
 
     <div class="cards-grid">
       <div class="card">
-        <h3>1. Automated Remote Installer</h3>
-        <p>Run the one-line installer in your terminal:</p>
+        <h3>1. One-Line Installer</h3>
+        <p>Run the automated setup in your terminal:</p>
         <pre><code>curl -fsSL https://raw.githubusercontent.com/deepeshparpani/airlock/main/install.sh | bash</code></pre>
-        <p style="font-size: 0.85rem; color: var(--text-dim);">Automatically compiles the native Rust binary if <code>cargo</code> is present; otherwise configures the zero-dependency Python hook.</p>
+        <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Auto-compiles the Rust binary if <code>cargo</code> is installed; otherwise configures the zero-dependency Python hook.</p>
       </div>
 
       <div class="card">
-        <h3>2. Universal Agent Execution (`airlock exec`)</h3>
-        <p>Guard any coding agent (Claude Code, Cursor, Cline, CI/CD):</p>
-        <pre><code># Safe commands execute with sub-millisecond governance:
+        <h3>2. Universal Execution Wrapper</h3>
+        <p>Guard any agent (Claude Code, Cursor, Cline, CI/CD):</p>
+        <pre><code># Safe commands execute with microsecond governance:
 airlock exec -- cargo test
 airlock exec -- npm run build
 
-# Destructive attacks are terminated immediately:
+# Destructive attacks are killed immediately:
 airlock exec -- rm -rf /</code></pre>
       </div>
 
       <div class="card">
-        <h3>3. Full Security Verification Suite</h3>
-        <p>Run the 67-point security test suite across all threat models:</p>
+        <h3>3. Run Verification Suite</h3>
+        <p>Execute the 67-point security test suite:</p>
         <pre><code>python3 test.py</code></pre>
-        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #34d399; margin-top: 0.5rem;">
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-green); margin-top: 0.5rem;">
           Total: 67 | Passed: 67 | Failed: 0 | Time: 0.74s
         </div>
       </div>
@@ -542,7 +505,7 @@ airlock exec -- rm -rf /</code></pre>
   <!-- Footer -->
   <footer>
     <p>Airlock is open-source software licensed under the <a href="https://github.com/deepeshparpani/airlock/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>.</p>
-    <p style="margin-top: 0.5rem;">Designed and engineered by <a href="https://github.com/deepeshparpani" target="_blank" rel="noopener">Danny (Deepesh Parpani)</a>.</p>
+    <p style="margin-top: 0.35rem;">Engineered by <a href="https://github.com/deepeshparpani" target="_blank" rel="noopener">Danny (Deepesh Parpani)</a>.</p>
   </footer>
 
   <script src="assets/js/main.js"></script>
