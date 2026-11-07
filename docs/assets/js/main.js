@@ -114,14 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (matched) {
         if (rule.verdict === 'ALLOW') {
           simOutput.innerHTML = `
-            <div class="verdict-allow">✔ allowed by Danny's custom classifier (${rule.latency})</div>
+            <div class="verdict-allow">✔ allowed by Airlock classifier (${rule.latency})</div>
             <div style="color: #cbd5e1; margin-top: 0.5rem;">Verdict: ALLOW</div>
             <div style="color: #94a3b8; font-size: 0.85rem;">Reason: ${rule.reason}</div>
             <div class="verdict-meta">Evaluation Engine: Native compiled Rust (Tier 0 AST &amp; zero-allocation regex)</div>
           `;
         } else {
           simOutput.innerHTML = `
-            <div class="verdict-deny">✖ denied by Danny's custom classifier (${rule.latency})</div>
+            <div class="verdict-deny">✖ denied by Airlock classifier (${rule.latency})</div>
             <div style="color: #cbd5e1; margin-top: 0.5rem;">Verdict: DENY (Immediate Execution Abort)</div>
             <div style="color: #fca5a5; font-size: 0.85rem;">Reason: ${rule.reason}</div>
             <div class="verdict-meta">Evaluation Engine: Native compiled Rust (Tier 0 Invariant Guardrail)</div>
